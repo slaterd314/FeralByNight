@@ -1,0 +1,1 @@
+## Interface: 30300## Title: Feral by Night## Notes: A full optional Feral Druid addon## Author: Nightcrowler of Runetotem (EU)## Version: 3.321## SavedVariables: FeralbyNightdbFeralbyNight.lua
