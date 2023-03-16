@@ -5,6 +5,7 @@
 -- Our base array
 FeralbyNight = {}
   
+local REQ_LEVEL=70
 
 -- Feral by Night variables NOT SAVED
 
@@ -57,6 +58,19 @@ function FbN_GetSpellNameById(spellId)
 	end
 	return spellName
 end
+
+function Fbn_UnitAura(unit, auraName, filter)
+	return AuraUtil.FindAuraByName(auraName, unit, filter)
+end
+
+function Fbn_UnitBuff(unit, auraName)
+	return Fbn_UnitAura(unit, auraName, "HELPFUL")
+end
+
+function Fbn_UnitDebuff(unit, auraName)
+	return Fbn_UnitAura(unit, auraName, "HARMFUL")
+end
+
 
 local bearform, _, _, _, _, _, _, _, _ = GetSpellInfo(9634);
 local catForm, _, _, _, _, _, _, _, _ = GetSpellInfo(768);
@@ -225,7 +239,7 @@ local language = GetLocale();
 		["Tempest Minion"] = 33998,
 	}
 	
-	--1-4---5-7---8-39 --aggiungi staticità dei proc con reset quando oo-combat
+	--1-4---5-7---8-39 --aggiungi staticitï¿½ dei proc con reset quando oo-combat
 	FeralbyNight.procaura={
 	["Misdirection"]=GetSpellInfo(34477),
 	["Hysteria"]=GetSpellInfo(49016),
@@ -1157,7 +1171,7 @@ function FeralbyNight.events.ADDON_LOADED(addon)
   local _,playerClass = UnitClass("player")
   local playerlevel = UnitLevel("player")
   
-  if (playerClass ~= "DRUID" or playerlevel<80) then
+  if (playerClass ~= "DRUID" or playerlevel<REQ_LEVEL) then
 	FeralbyNight.eventFrame:UnregisterEvent("PLAYER_ALIVE")
 	FeralbyNight.eventFrame:UnregisterEvent("ADDON_LOADED")
 	FeralbyNight.eventFrame:UnregisterEvent("PLAYER_LOGIN")
@@ -1651,134 +1665,155 @@ end
 
 function FeralbyNight:CreateGUI()
 
-  local hudFrame = CreateFrame("Frame","FeralbyNightHudFrame",UIParent)
+  local hudFrame = CreateFrame("Frame","FeralbyNightHudFrame",UIParent, "BackdropTemplate")
+
   hudFrame:SetFrameStrata("Low")
   hudFrame:SetPoint("BOTTOM",0,150)
-  hudFrame:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
-  			})
+  hudFrame.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+  hudFrame:ApplyBackdrop()
+--  hudFrame:SetBackdrop({
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
+--  			})
 
 
-		local MeleeFrame = CreateFrame("SimpleHTML","FeralbyNightMeleeFrame",UIParent)
+
+		local MeleeFrame = CreateFrame("SimpleHTML","FeralbyNightMeleeFrame",UIParent, "BackdropTemplate")
 		MeleeFrame:SetFrameStrata("Low")
 		MeleeFrame:SetWidth(220); 
 		MeleeFrame:SetHeight(62);
 		MeleeFrame:SetPoint("BOTTOM",250,140)
-		MeleeFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.MeleeFramefont, FeralbyNightdb.MeleeFramefontsize);
-		MeleeFrame:SetTextColor(1,1,1,1)
-		MeleeFrame:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
-  			})
+		MeleeFrame:SetFont('body',"Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.MeleeFramefont, FeralbyNightdb.MeleeFramefontsize,"");
+		MeleeFrame:SetTextColor('body', 1,1,1,1)
+		MeleeFrame.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+		MeleeFrame:ApplyBackdrop()
+--		MeleeFrame:SetBackdrop({
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
+--  			})
 
-  local displayFrame = CreateFrame("Frame","FeralbyNightDisplayFrame",UIParent)
+  local displayFrame = CreateFrame("Frame","FeralbyNightDisplayFrame",UIParent, "BackdropTemplate")
   displayFrame:SetFrameStrata("Low")
   displayFrame:SetWidth(250)
   displayFrame:SetHeight(90)
-  displayFrame:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
-  			})
+  displayFrame.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+  displayFrame:ApplyBackdrop()
+--  displayFrame:SetBackdrop({
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
+--  			})
  
-   local oocFrame = CreateFrame("Frame","FeralbyNightoocFrame",UIParent)
+   local oocFrame = CreateFrame("Frame","FeralbyNightoocFrame",UIParent, "BackdropTemplate")
   oocFrame:SetFrameStrata("Low")
   oocFrame:SetWidth(128)
   oocFrame:SetHeight(128)
-  oocFrame:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
-  			})
-   local noticeFrame = CreateFrame("Frame","FeralbyNightnoticeFrame",UIParent)
+  oocFrame.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+  oocFrame:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
+--  			})
+   local noticeFrame = CreateFrame("Frame","FeralbyNightnoticeFrame",UIParent, "BackdropTemplate")
   noticeFrame:SetFrameStrata("Low")
   noticeFrame:SetWidth(256)
   noticeFrame:SetHeight(256)
-  noticeFrame:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
-  			})
+  noticeFrame.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+  noticeFrame:ApplyBackdrop()
+--   noticeFrame:SetBackdrop(BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32)
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
+--  			})
   
-    local cdmonFrame1 = CreateFrame("Frame","FeralbyNightcdmonFrame1",UIParent)
+    local cdmonFrame1 = CreateFrame("Frame","FeralbyNightcdmonFrame1",UIParent, "BackdropTemplate")
   cdmonFrame1:SetFrameStrata("Low")
   cdmonFrame1:SetWidth(175)
   cdmonFrame1:SetHeight(30)
-  cdmonFrame1:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
-  			})
+  cdmonFrame1.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+  cdmonFrame1:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
+--  			})
   			
-     local cdmonFrame2 = CreateFrame("Frame","FeralbyNightcdmonFrame2",UIParent)
+     local cdmonFrame2 = CreateFrame("Frame","FeralbyNightcdmonFrame2",UIParent, "BackdropTemplate")
   cdmonFrame2:SetFrameStrata("Low")
   cdmonFrame2:SetWidth(175)
   cdmonFrame2:SetHeight(30)
-  cdmonFrame2:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
-  			})
+  cdmonFrame2.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+  cdmonFrame2:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
+--  			})
  
-     local cdmonFrame3 = CreateFrame("Frame","FeralbyNightcdmonFrame3",UIParent)
+     local cdmonFrame3 = CreateFrame("Frame","FeralbyNightcdmonFrame3",UIParent, "BackdropTemplate")
   cdmonFrame3:SetFrameStrata("Low")
   cdmonFrame3:SetWidth(175)
   cdmonFrame3:SetHeight(30)
-  cdmonFrame3:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
-  			})
+  cdmonFrame3.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+  cdmonFrame3:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
+--  			})
   			
-     local bossfightFrame = CreateFrame("Frame","FeralbyNightbossfightFrame",UIParent)
+     local bossfightFrame = CreateFrame("Frame","FeralbyNightbossfightFrame",UIParent, "BackdropTemplate")
   bossfightFrame:SetFrameStrata("Low")
   bossfightFrame:SetWidth(175)
   bossfightFrame:SetHeight(30)
-  bossfightFrame:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
-  			})
-     local myfightFrame = CreateFrame("Frame","FeralbyNightmyfightFrame",UIParent)
+  bossfightFrame.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+  bossfightFrame:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
+--  			})
+     local myfightFrame = CreateFrame("Frame","FeralbyNightmyfightFrame",UIParent, "BackdropTemplate")
   myfightFrame:SetFrameStrata("Low")
   myfightFrame:SetWidth(175)
   myfightFrame:SetHeight(30)
-  myfightFrame:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
-  			})
-      local procFrame = CreateFrame("Frame","FeralbyNightprocFrame",UIParent)
+  myfightFrame.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+  myfightFrame:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
+--  			})
+      local procFrame = CreateFrame("Frame","FeralbyNightprocFrame",UIParent, "BackdropTemplate")
   procFrame:SetFrameStrata("Low")
   procFrame:SetWidth(175)
   procFrame:SetHeight(30)
-  procFrame:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
-  			})
+  procFrame.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+  procFrame:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
+--  			})
   			
-  					local CPFrame = CreateFrame("SimpleHTML","FeralbyNightCPFrame",UIParent)
+  					local CPFrame = CreateFrame("SimpleHTML","FeralbyNightCPFrame",UIParent, "BackdropTemplate")
 		CPFrame:SetFrameStrata("Low")
 		CPFrame:SetWidth(40); 
 		CPFrame:SetHeight(20);
 		CPFrame:SetPoint("CENTER",-100,0)
-		CPFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cpFramefont, FeralbyNightdb.cpFramefontsize);
-		CPFrame:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
-  			})
+		CPFrame:SetFont('body', "Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cpFramefont, FeralbyNightdb.cpFramefontsize,"");
+		CPFrame.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+		CPFrame:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
+--  			})
   
-    					local timetokillFrame = CreateFrame("SimpleHTML","FeralbyNighttimetokillFrame",UIParent)
+    					local timetokillFrame = CreateFrame("SimpleHTML","FeralbyNighttimetokillFrame",UIParent, "BackdropTemplate")
 		timetokillFrame:SetFrameStrata("Low")
 		timetokillFrame:SetWidth(40); 
 		timetokillFrame:SetHeight(20);
 		timetokillFrame:SetPoint("CENTER",0,0)
-		timetokillFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cpFramefont, FeralbyNightdb.cpFramefontsize);
-		timetokillFrame:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
-  			})
+		timetokillFrame:SetFont('body', "Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cpFramefont, FeralbyNightdb.cpFramefontsize,"");
+		timetokillFrame.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+		timetokillFrame:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
+--  			})
   			
-    					local srFrame = CreateFrame("SimpleHTML","FeralbyNightsrFrame",UIParent)
+    					local srFrame = CreateFrame("SimpleHTML","FeralbyNightsrFrame",UIParent, "BackdropTemplate")
 		srFrame:SetFrameStrata("Low")
 		srFrame:SetWidth(40); 
 		srFrame:SetHeight(20);
 		srFrame:SetPoint("CENTER",0,-50)
-		srFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.srFramefont, FeralbyNightdb.srFramefontsize);
-		srFrame:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
-  			})
+		srFrame:SetFont('body', "Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.srFramefont, FeralbyNightdb.srFramefontsize,"");
+		srFrame.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+		srFrame:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
+--  			})
   			
   			
-			local energyFrame = CreateFrame("SimpleHTML","FeralbyNightenergyFrame",UIParent)
+			local energyFrame = CreateFrame("SimpleHTML","FeralbyNightenergyFrame",UIParent, "BackdropTemplate")
 		energyFrame:SetFrameStrata("Low")
 		energyFrame:SetWidth(40); 
 		energyFrame:SetHeight(20);
 		energyFrame:SetPoint("CENTER",100,0)
-		energyFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.energyFramefont, FeralbyNightdb.energyFramefontsize);
-		energyFrame:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
-  			})
+		energyFrame:SetFont('body', "Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.energyFramefont, FeralbyNightdb.energyFramefontsize,"");
+		energyFrame.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+		energyFrame:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 32,
+--  			})
   			
   displayFrame:SetBackdropColor(0, 0, 0, .4)
   displayFrame:EnableMouse(true)
@@ -1910,41 +1945,42 @@ function FeralbyNight:CreateGUI()
   energyFrame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
 
 
-  local displayFrame_last = CreateFrame("Frame","$parent_last", FeralbyNightDisplayFrame)
-  local displayFrame_current = CreateFrame("Frame","$parent_current", FeralbyNightDisplayFrame)
-  local displayFrame_next = CreateFrame("Frame","$parent_next", FeralbyNightDisplayFrame)
-  local displayFrame_misc = CreateFrame("Frame","$parent_misc", FeralbyNightDisplayFrame)
-  local displayFrame_int = CreateFrame("Frame","$parent_int", FeralbyNightDisplayFrame)
+  local displayFrame_last = CreateFrame("Frame","$parent_last", FeralbyNightDisplayFrame, "BackdropTemplate")
+  local displayFrame_current = CreateFrame("Frame","$parent_current", FeralbyNightDisplayFrame, "BackdropTemplate")
+  local displayFrame_next = CreateFrame("Frame","$parent_next", FeralbyNightDisplayFrame, "BackdropTemplate")
+  local displayFrame_misc = CreateFrame("Frame","$parent_misc", FeralbyNightDisplayFrame, "BackdropTemplate")
+  local displayFrame_int = CreateFrame("Frame","$parent_int", FeralbyNightDisplayFrame, "BackdropTemplate")
   
-  local hudFrame_powerbar=CreateFrame("Frame","$parent_powerbar",FeralbyNightHudFrame);
-  local hudFrame_powerbar_frame=CreateFrame("StatusBar","$parent_frame",FeralbyNightHudFrame_powerbar);
-  local hudFrame_castbar=CreateFrame("Frame","$parent_castbar",FeralbyNightHudFrame);
-  local hudFrame_castbar_frame=CreateFrame("StatusBar","$parent_frame",FeralbyNightHudFrame_castbar);
-  local hudFrame_healthbar=CreateFrame("Frame","$parent_healthbar",FeralbyNightHudFrame);
-  local hudFrame_healthbar_frame=CreateFrame("StatusBar","$parent_frame",FeralbyNightHudFrame_healthbar);
-  local hudFrame_bosspowerbar=CreateFrame("Frame","$parent_bosspowerbar",FeralbyNightHudFrame);
-  local hudFrame_bosspowerbar_frame=CreateFrame("StatusBar","$parent_frame",FeralbyNightHudFrame_bosspowerbar);
-  local hudFrame_bosshealthbar=CreateFrame("Frame","$parent_bosshealthbar",FeralbyNightHudFrame);
-  local hudFrame_bosshealthbar_frame=CreateFrame("StatusBar","$parent_frame",FeralbyNightHudFrame_bosshealthbar);
-  local hudFrame_manabar=CreateFrame("Frame","$parent_manabar",FeralbyNightHudFrame);
-  local hudFrame_manabar_frame=CreateFrame("StatusBar","$parent_frame",FeralbyNightHudFrame_manabar);
-  local hudFrame_threatbar=CreateFrame("Frame","$parent_threatbar",FeralbyNightHudFrame);
-  local hudFrame_threatbar_frame=CreateFrame("StatusBar","$parent_frame",FeralbyNightHudFrame_threatbar);
+  local hudFrame_powerbar=CreateFrame("Frame","$parent_powerbar",FeralbyNightHudFrame, "BackdropTemplate");
+  local hudFrame_powerbar_frame=CreateFrame("StatusBar","$parent_frame",FeralbyNightHudFrame_powerbar, "BackdropTemplate");
+  local hudFrame_castbar=CreateFrame("Frame","$parent_castbar",FeralbyNightHudFrame, "BackdropTemplate");
+  local hudFrame_castbar_frame=CreateFrame("StatusBar","$parent_frame",FeralbyNightHudFrame_castbar, "BackdropTemplate");
+  local hudFrame_healthbar=CreateFrame("Frame","$parent_healthbar",FeralbyNightHudFrame, "BackdropTemplate");
+  local hudFrame_healthbar_frame=CreateFrame("StatusBar","$parent_frame",FeralbyNightHudFrame_healthbar, "BackdropTemplate");
+  local hudFrame_bosspowerbar=CreateFrame("Frame","$parent_bosspowerbar",FeralbyNightHudFrame, "BackdropTemplate");
+  local hudFrame_bosspowerbar_frame=CreateFrame("StatusBar","$parent_frame",FeralbyNightHudFrame_bosspowerbar, "BackdropTemplate");
+  local hudFrame_bosshealthbar=CreateFrame("Frame","$parent_bosshealthbar",FeralbyNightHudFrame, "BackdropTemplate");
+  local hudFrame_bosshealthbar_frame=CreateFrame("StatusBar","$parent_frame",FeralbyNightHudFrame_bosshealthbar, "BackdropTemplate");
+  local hudFrame_manabar=CreateFrame("Frame","$parent_manabar",FeralbyNightHudFrame, "BackdropTemplate");
+  local hudFrame_manabar_frame=CreateFrame("StatusBar","$parent_frame",FeralbyNightHudFrame_manabar, "BackdropTemplate");
+  local hudFrame_threatbar=CreateFrame("Frame","$parent_threatbar",FeralbyNightHudFrame, "BackdropTemplate");
+  local hudFrame_threatbar_frame=CreateFrame("StatusBar","$parent_frame",FeralbyNightHudFrame_threatbar, "BackdropTemplate");
 
 
    
 for i = 1, 5 do
-    local cdmonFramedumb1 = CreateFrame('SimpleHTML',"$parent_"..i,FeralbyNightcdmonFrame1)
+    local cdmonFramedumb1 = CreateFrame('SimpleHTML',"$parent_"..i,FeralbyNightcdmonFrame1, "BackdropTemplate")
     cdmonFramedumb1:SetWidth(30)
     cdmonFramedumb1:SetHeight(30)
     cdmonFramedumb1:SetPoint("LEFT",(i-1)*35,0)
-	cdmonFramedumb1:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 30,
-  			}) 
+	cdmonFramedumb1.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+	cdmonFramedumb1:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 30,
+--  			}) 
     cdmonFramedumb1:SetBackdropColor(0, 0, 0,0)
-	cdmonFramedumb1:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1);
+	cdmonFramedumb1:SetFont('body', "Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1,"");
    
-  local t =cdmonFramedumb1:CreateTexture(nil,"Low")
+  local t =cdmonFramedumb1:CreateTexture(nil,"BACKGROUND")
   t:SetTexture(nil)
   t:SetAllPoints(cdmonFramedumb1)
   t:SetAlpha(0.1)
@@ -1953,17 +1989,18 @@ for i = 1, 5 do
 end
 
 for i = 1, 5 do
-    local cdmonFramedumb2 = CreateFrame('SimpleHTML',"$parent_"..i,FeralbyNightcdmonFrame2)
+    local cdmonFramedumb2 = CreateFrame('SimpleHTML',"$parent_"..i,FeralbyNightcdmonFrame2, "BackdropTemplate")
     cdmonFramedumb2:SetWidth(30)
     cdmonFramedumb2:SetHeight(30)
     cdmonFramedumb2:SetPoint("LEFT",(i-1)*35,0)
-	cdmonFramedumb2:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 30,
-  			}) 
+	cdmonFramedumb2.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+	cdmonFramedumb2:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 30,
+--  			}) 
     cdmonFramedumb2:SetBackdropColor(0, 0, 0,0)
-	cdmonFramedumb2:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2);
+	cdmonFramedumb2:SetFont('body', "Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2,"");
    
-  local t =cdmonFramedumb2:CreateTexture(nil,"Low")
+  local t =cdmonFramedumb2:CreateTexture(nil,"BACKGROUND")
   t:SetTexture(nil)
   t:SetAllPoints(cdmonFramedumb2)
   t:SetAlpha(0.1)
@@ -1972,17 +2009,18 @@ for i = 1, 5 do
 end
 
 for i = 1, 5 do
-    local cdmonFramedumb3 = CreateFrame('SimpleHTML',"$parent_"..i,FeralbyNightcdmonFrame3)
+    local cdmonFramedumb3 = CreateFrame('SimpleHTML',"$parent_"..i,FeralbyNightcdmonFrame3, "BackdropTemplate")
     cdmonFramedumb3:SetWidth(30)
     cdmonFramedumb3:SetHeight(30)
     cdmonFramedumb3:SetPoint("LEFT",(i-1)*35,0)
-	cdmonFramedumb3:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 30,
-  			}) 
+	cdmonFramedumb3.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+	cdmonFramedumb3:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 30,
+--  			}) 
     cdmonFramedumb3:SetBackdropColor(0, 0, 0,0)
-	cdmonFramedumb3:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3);
+	cdmonFramedumb3:SetFont('body', "Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3,"");
    
-  local t =cdmonFramedumb3:CreateTexture(nil,"Low")
+  local t =cdmonFramedumb3:CreateTexture(nil,"BACKGROUND")
   t:SetTexture(nil)
   t:SetAllPoints(cdmonFramedumb3)
   t:SetAlpha(0.1)
@@ -1991,17 +2029,18 @@ for i = 1, 5 do
 end
 
 for i = 1, 5 do
-    local bossfightFramedumb = CreateFrame('SimpleHTML',"$parent_"..i,FeralbyNightbossfightFrame)
+    local bossfightFramedumb = CreateFrame('SimpleHTML',"$parent_"..i,FeralbyNightbossfightFrame, "BackdropTemplate")
     bossfightFramedumb:SetWidth(30)
     bossfightFramedumb:SetHeight(30)
     bossfightFramedumb:SetPoint("LEFT",(i-1)*35,0)
-	bossfightFramedumb:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 30,
-  			}) 
+	bossfightFramedumb.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+	bossfightFramedumb:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 30,
+--  			}) 
     bossfightFramedumb:SetBackdropColor(0, 0, 0,0)
-	bossfightFramedumb:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.bossfightFramefont, FeralbyNightdb.bossfightFramefontsize);
+	bossfightFramedumb:SetFont('body', "Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.bossfightFramefont, FeralbyNightdb.bossfightFramefontsize,"");
    
-  local t =bossfightFramedumb:CreateTexture(nil,"Low")
+  local t =bossfightFramedumb:CreateTexture(nil,"BACKGROUND")
   t:SetTexture(nil)
   t:SetAllPoints(bossfightFramedumb)
   t:SetAlpha(0.1)
@@ -2010,17 +2049,18 @@ for i = 1, 5 do
 end
 
 for i = 1, 5 do
-    local myfightFramedumb = CreateFrame('SimpleHTML',"$parent_"..i,FeralbyNightmyfightFrame)
+    local myfightFramedumb = CreateFrame('SimpleHTML',"$parent_"..i,FeralbyNightmyfightFrame, "BackdropTemplate")
     myfightFramedumb:SetWidth(30)
     myfightFramedumb:SetHeight(30)
     myfightFramedumb:SetPoint("LEFT",(i-1)*35,0)
-	myfightFramedumb:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 30,
-  			}) 
+	myfightFramedumb.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+	myfightFramedumb:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 30,
+--  			}) 
     myfightFramedumb:SetBackdropColor(0, 0, 0,0)
-	myfightFramedumb:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.myfightFramefont, FeralbyNightdb.myfightFramefontsize);
+	myfightFramedumb:SetFont('body', "Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.myfightFramefont, FeralbyNightdb.myfightFramefontsize,"");
    
-  local t =myfightFramedumb:CreateTexture(nil,"Low")
+  local t =myfightFramedumb:CreateTexture(nil,"BACKGROUND")
   t:SetTexture(nil)
   t:SetAllPoints(myfightFramedumb)
   t:SetAlpha(0.1)
@@ -2029,17 +2069,18 @@ for i = 1, 5 do
 end
 
 for i = 1, 5 do
-    local procFramedumb = CreateFrame('SimpleHTML',"$parent_"..i,FeralbyNightprocFrame)
+    local procFramedumb = CreateFrame('SimpleHTML',"$parent_"..i,FeralbyNightprocFrame, "BackdropTemplate")
     procFramedumb:SetWidth(30)
     procFramedumb:SetHeight(30)
     procFramedumb:SetPoint("LEFT",(i-1)*35,0)
-	procFramedumb:SetBackdrop({
-          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 30,
-  			}) 
+	procFramedumb.backdropInfo = BACKDROP_WRATH_CHARACTER_CREATE_TOOLTIP_32_32
+	procFramedumb:ApplyBackdrop()
+--          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 30,
+--  			}) 
     procFramedumb:SetBackdropColor(0, 0, 0,0)
-	procFramedumb:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.procFramefont, FeralbyNightdb.procFramefontsize);
+	procFramedumb:SetFont('body', "Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.procFramefont, FeralbyNightdb.procFramefontsize,"");
    
-  local t =procFramedumb:CreateTexture(nil,"Low")
+  local t =procFramedumb:CreateTexture(nil,"BACKGROUND")
   t:SetTexture(nil)
   t:SetAllPoints(procFramedumb)
   t:SetAlpha(0.1)
@@ -2048,7 +2089,7 @@ for i = 1, 5 do
 end
 
 
-  local t =oocFrame:CreateTexture(nil,"Low")
+  local t =oocFrame:CreateTexture(nil,"BACKGROUND")
   t:SetTexture(nil)
   t:SetAllPoints(oocFrame)
   t:SetAlpha(0.5)
@@ -2056,7 +2097,7 @@ end
   FeralbyNight.ooctexture = t
   
 
-  local tt =noticeFrame:CreateTexture(nil,"Low")
+  local tt =noticeFrame:CreateTexture(nil,"BACKGROUND")
   tt:SetTexture(nil)
   tt:SetAllPoints(noticeFrame)
   tt:SetAlpha(0.5)
@@ -2218,14 +2259,14 @@ end
   hudFrame_threatbar_frame:SetOrientation("VERTICAL")
   
 
-  local t = displayFrame_last:CreateTexture(nil,"Low")
+  local t = displayFrame_last:CreateTexture(nil,"BACKGROUND")
   t:SetTexture(nil)
   t:SetAllPoints(displayFrame_last)
   t:SetAlpha(.8)
   displayFrame_last.texture = t
   FeralbyNight.textureList["last"] = t
 
-  t = displayFrame_current:CreateTexture(nil,"Low")
+  t = displayFrame_current:CreateTexture(nil,"BACKGROUND")
   t:SetTexture(nil)
   t:ClearAllPoints()
   t:SetAllPoints(displayFrame_current)
@@ -2234,21 +2275,21 @@ end
 
 
 
-  t = displayFrame_next:CreateTexture(nil,"Low")
+  t = displayFrame_next:CreateTexture(nil,"BACKGROUND")
   t:SetTexture(nil)
   t:SetAllPoints(displayFrame_next)
   t:SetAlpha(.8)
   displayFrame_next.texture = t
   FeralbyNight.textureList["next"] = t
 
-  t = displayFrame_misc:CreateTexture(nil,"Low")
+  t = displayFrame_misc:CreateTexture(nil,"BACKGROUND")
   t:SetTexture(nil)
   t:SetAllPoints(displayFrame_misc)
   t:SetAlpha(.8)
   displayFrame_misc.texture = t
   FeralbyNight.textureList["misc"] = t
 
-  t = displayFrame_int:CreateTexture(nil,"Low")
+  t = displayFrame_int:CreateTexture(nil,"BACKGROUND")
   t:SetTexture(nil)
   t:SetAllPoints(displayFrame_int)
   t:SetAlpha(.8)
@@ -2309,88 +2350,88 @@ end
 
 
   local text_cap = FeralbyNight.hudFrame_powerbar:CreateFontString("FeralbyNightHudFrame_powerbar_text","OVERLAY")
-  text_cap:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize)
+  text_cap:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"")
   text_cap:ClearAllPoints()
   text_cap:SetPoint("CENTER",0,0) 
   text_cap:SetTextColor(1,1,1,1)
   text_cap:SetJustifyV("CENTER")  
   text_cap:SetJustifyH("CENTER")  
-  text_cap:SetText(nil)
+  text_cap:SetText("")
 text_cap:SetShadowColor(0,0,0,1)
 text_cap:SetShadowOffset(1,-1)
   FeralbyNight.hudFrame_powerbar.text=text_cap
   
   text_cap = FeralbyNight.hudFrame_bosshealthbar:CreateFontString("FeralbyNightHudFrame_bosshealthbar_text","OVERLAY")
-    text_cap:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize)
+    text_cap:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"")
    text_cap:ClearAllPoints()
   text_cap:SetPoint("CENTER",0,0) 
   text_cap:SetTextColor(1,1,1,1)
   text_cap:SetJustifyV("CENTER")  
   text_cap:SetJustifyH("CENTER")  
-  text_cap:SetText(nil)
+  text_cap:SetText("")
 text_cap:SetShadowColor(0,0,0,1)
 text_cap:SetShadowOffset(1,-1)
   FeralbyNight.hudFrame_bosshealthbar.text=text_cap
 
   text_cap = FeralbyNight.hudFrame_healthbar:CreateFontString("FeralbyNightHudFrame_healthbar_text","OVERLAY")
-   text_cap:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize)
+   text_cap:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"")
    text_cap:ClearAllPoints()
   text_cap:SetPoint("CENTER",0,0) 
   text_cap:SetTextColor(1,1,1,1)
   text_cap:SetJustifyV("CENTER")  
   text_cap:SetJustifyH("CENTER")  
-  text_cap:SetText(nil)
+  text_cap:SetText("")
 text_cap:SetShadowColor(0,0,0,1)
 text_cap:SetShadowOffset(1,-1)
    FeralbyNight.hudFrame_healthbar.text=text_cap
 
   text_cap = FeralbyNight.hudFrame_bosspowerbar:CreateFontString("FeralbyNightHudFrame_bosspowerbar_text","OVERLAY")
-    text_cap:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize)
+    text_cap:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"")
   text_cap:ClearAllPoints()
   text_cap:SetPoint("CENTER",0,0) 
   text_cap:SetTextColor(1,1,1,1)
   text_cap:SetJustifyV("CENTER")  
   text_cap:SetJustifyH("CENTER")  
-  text_cap:SetText(nil)
+  text_cap:SetText("")
 text_cap:SetShadowColor(0,0,0,1)
 text_cap:SetShadowOffset(1,-1)
    FeralbyNight.hudFrame_bosspowerbar.text=text_cap
 
 
   text_cap = FeralbyNight.hudFrame_castbar:CreateFontString("FeralbyNightHudFrame_castbar_text","OVERLAY")
-      text_cap:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize)
+      text_cap:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"")
    text_cap:ClearAllPoints()
   text_cap:SetPoint("CENTER",0,0) 
   text_cap:SetTextColor(1,1,1,1)
   text_cap:SetJustifyV("CENTER")  
   text_cap:SetJustifyH("CENTER")  
-  text_cap:SetText(nil)
+  text_cap:SetText("")
 text_cap:SetShadowColor(0,0,0,1)
 text_cap:SetShadowOffset(1,-1)
     FeralbyNight.hudFrame_castbar.text=text_cap
 
   
   text_cap = FeralbyNight.hudFrame_threatbar:CreateFontString("FeralbyNightHudFrame_threatbar_text","OVERLAY")
-   text_cap:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize)
+   text_cap:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"")
    text_cap:ClearAllPoints()
   text_cap:SetPoint("CENTER",0,0) 
   text_cap:SetTextColor(1,1,1,1)
   text_cap:SetJustifyV("CENTER")  
   text_cap:SetJustifyH("CENTER")  
-text_cap:SetText(nil)
+text_cap:SetText("")
 text_cap:SetShadowColor(0,0,0,1)
 text_cap:SetShadowOffset(1,-1)
    FeralbyNight.hudFrame_threatbar.text=text_cap
 
   
   text_cap = FeralbyNight.hudFrame_manabar:CreateFontString("FeralbyNightHudFrame_manabar_text","OVERLAY")
-   text_cap:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize)
+   text_cap:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"")
    text_cap:ClearAllPoints()
   text_cap:SetPoint("CENTER",0,0) 
   text_cap:SetTextColor(1,1,1,1)
   text_cap:SetJustifyV("CENTER")  
   text_cap:SetJustifyH("CENTER")  
-  text_cap:SetText(nil)
+  text_cap:SetText("")
 text_cap:SetShadowColor(0,0,0,1)
 text_cap:SetShadowOffset(1,-1)
    FeralbyNight.hudFrame_manabar.text=text_cap
@@ -2494,8 +2535,8 @@ function FeralbyNight:OnUpdate(elapsed)
   FeralbyNight.timeSinceLastUpdate = FeralbyNight.timeSinceLastUpdate + elapsed;
   while (FeralbyNight.timeSinceLastUpdate >= FeralbyNightdb.updateinterval) do
     
-    	local catform, _, _, _, _, _, _, _, _ = UnitAura("player", FeralbyNight.L["Cat Form"]); 
-	local bearform, _, _, _, _, _, _, _, _ = UnitAura("player", FeralbyNight.L["Dire Bear Form"]); 
+    	local catform, _, _, _, _, _, _, _, _ = Fbn_UnitAura("player", FeralbyNight.L["Cat Form"]); 
+	local bearform, _, _, _, _, _, _, _, _ = Fbn_UnitAura("player", FeralbyNight.L["Dire Bear Form"]); 
 	
 	  ParseGUID(UnitGUID("target"))
 if FeralbyNight.playertargetchanged == 1 then
@@ -2685,7 +2726,7 @@ end
 		end
   	
 
-  local	name, _, _, _, _, _, _, _, _ = UnitAura("player", FeralbyNight.L["Clearcasting"]); 
+  local	name, _, _, _, _, _, _, _, _ = Fbn_UnitAura("player", FeralbyNight.L["Clearcasting"]); 
 	if name ~= nil then
 		FeralbyNight.ooctexture:SetTexture("Interface\\AddOns\\FeralbyNight\\arts\\clearcast.tga")
 	else
@@ -2693,16 +2734,16 @@ end
 	end
 
 local sr_frame_count=0
-local name, _, _, _, _, _, expirationTime, _, _ = UnitAura("player", FeralbyNight.L["Savage Roar"]); 
+local name, _, _, _, _, _, expirationTime, _, _ = Fbn_UnitAura("player", FeralbyNight.L["Savage Roar"]); 
 	if name ~= nil then
 		sr_frame_count = expirationTime - currentTime
 	end	
 	if (bearform~= nil) then
- name, _, _, _, _, _, expirationTime, _, _ = UnitAura("player", FeralbyNight.L["Barkskin"]); 
+ name, _, _, _, _, _, expirationTime, _, _ = Fbn_UnitAura("player", FeralbyNight.L["Barkskin"]); 
 	if name ~= nil then
 		sr_frame_count = expirationTime - currentTime
 	end	
- name, _, _, _, _, _, expirationTime, _, _ = UnitAura("player", FeralbyNight.L["Survival Instincts"]); 
+ name, _, _, _, _, _, expirationTime, _, _ = Fbn_UnitAura("player", FeralbyNight.L["Survival Instincts"]); 
 	if name ~= nil then
 		sr_frame_count = expirationTime - currentTime
 	end	
@@ -2712,7 +2753,7 @@ local name, _, _, _, _, _, expirationTime, _, _ = UnitAura("player", FeralbyNigh
     local lacerate=0
     local lacerate_stack=0
     
- 	local	 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Lacerate Debuff"]); 
+ 	local	 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Lacerate Debuff"]); 
 	if name ~= nil and caster == "player" then
 		lacerate = expirationTime - currentTime
 		lacerate_stack=count
@@ -2746,9 +2787,9 @@ local maxhp=UnitHealthMax("player");
 	elseif bosslevel ==-1 then
 	bosslevel = 83
 	end
-	FeralbyNight.hudFrame_bosspowerbar.text:SetText(nil)
-	FeralbyNight.hudFrame_bosshealthbar.text:SetText(nil)
-	FeralbyNight.hudFrame_threatbar.text:SetText(nil)
+	FeralbyNight.hudFrame_bosspowerbar.text:SetText("")
+	FeralbyNight.hudFrame_bosshealthbar.text:SetText("")
+	FeralbyNight.hudFrame_threatbar.text:SetText("")
 	
 
 
@@ -2907,11 +2948,11 @@ end
 	  	
 	  	
 		if sr_frame_count<0.1 then
-	FeralbyNightsrFrame:SetTextColor(1,1,1,0)
+	FeralbyNightsrFrame:SetTextColor('body', 1,1,1,0)
 	elseif sr_frame_count>4 then
-	FeralbyNightsrFrame:SetTextColor(1,1,1,1)
+	FeralbyNightsrFrame:SetTextColor('body', 1,1,1,1)
 	else
-	    FeralbyNightsrFrame:SetTextColor(math.abs(math.sin(currentTime*3.28)),0,math.abs(math.cos(currentTime*3.28)),1);
+	    FeralbyNightsrFrame:SetTextColor('body', math.abs(math.sin(currentTime*3.28)),0,math.abs(math.cos(currentTime*3.28)),1);
 	end
 	FeralbyNightsrFrame:SetText(string.format("%.0f", sr_frame_count))
 	  	
@@ -2931,43 +2972,43 @@ end
 	end
 	
 	 	if power<(rake_energy) then
-	FeralbyNightenergyFrame:SetTextColor(1,1,1,1)
+	FeralbyNightenergyFrame:SetTextColor('body', 1,1,1,1)
 	elseif power<(rake_energy+shred_energy-10) then
-	FeralbyNightenergyFrame:SetTextColor(1,1,0,1)
+	FeralbyNightenergyFrame:SetTextColor('body', 1,1,0,1)
 	elseif power<(rake_energy+shred_energy+rip_energy-20) then
-	FeralbyNightenergyFrame:SetTextColor(1,0.5,0,1)
+	FeralbyNightenergyFrame:SetTextColor('body', 1,0.5,0,1)
 	else
-	FeralbyNightenergyFrame:SetTextColor(1,0,0,1)
+	FeralbyNightenergyFrame:SetTextColor('body', 1,0,0,1)
 	end
 	FeralbyNightenergyFrame:SetText(string.format("%.0f", energy))
 	
 		if cp<1 then
-	FeralbyNightCPFrame:SetTextColor(1,1,1,1)
+	FeralbyNightCPFrame:SetTextColor('body', 1,1,1,1)
 	elseif cp<FeralbyNightdb.SRCP then
-		FeralbyNightCPFrame:SetTextColor(0,1,0,1)
+		FeralbyNightCPFrame:SetTextColor('body', 0,1,0,1)
 	elseif cp<5 then
-		FeralbyNightCPFrame:SetTextColor(1,1,0,1)
+		FeralbyNightCPFrame:SetTextColor('body', 1,1,0,1)
 	elseif energy<35 then
-		FeralbyNightCPFrame:SetTextColor(1,0,0,1)
+		FeralbyNightCPFrame:SetTextColor('body', 1,0,0,1)
 	else
-	    FeralbyNightCPFrame:SetTextColor(math.abs(math.sin(currentTime*3.28)),0,math.abs(math.cos(currentTime*3.28)),1);
+	    FeralbyNightCPFrame:SetTextColor('body', math.abs(math.sin(currentTime*3.28)),0,math.abs(math.cos(currentTime*3.28)),1);
 	end
 	FeralbyNightCPFrame:SetText(string.format("%.0f", cp))
 	
 	  	
 	elseif UnitPowerType("Player")==1 then
 	if power<10 then
-	FeralbyNightenergyFrame:SetTextColor(1,1,1,1)
+	FeralbyNightenergyFrame:SetTextColor('body', 1,1,1,1)
 		elseif power<15 then
-	FeralbyNightenergyFrame:SetTextColor(1,1,0.5,1)
+	FeralbyNightenergyFrame:SetTextColor('body', 1,1,0.5,1)
 		elseif power<25 then
-	FeralbyNightenergyFrame:SetTextColor(1,1,0,1)
+	FeralbyNightenergyFrame:SetTextColor('body', 1,1,0,1)
 		elseif power<50 then
-	FeralbyNightenergyFrame:SetTextColor(1,0.5,0,1)
+	FeralbyNightenergyFrame:SetTextColor('body', 1,0.5,0,1)
 		elseif power<75 then
-	FeralbyNightenergyFrame:SetTextColor(1,0.2,0,1)
+	FeralbyNightenergyFrame:SetTextColor('body', 1,0.2,0,1)
 		else
-	FeralbyNightenergyFrame:SetTextColor(1,0,0,1)
+	FeralbyNightenergyFrame:SetTextColor('body', 1,0,0,1)
 	end
 	
 		FeralbyNightenergyFrame:SetText(string.format("%.0f", rage))
@@ -2989,15 +3030,15 @@ end
 	end
 	
 			if lacerate < 4.5 and lacerate_stack>0 then
-	FeralbyNightCPFrame:SetTextColor(math.abs(math.sin(currentTime*3.28)),0,math.abs(math.cos(currentTime*3.28)),1);
+	FeralbyNightCPFrame:SetTextColor('body', math.abs(math.sin(currentTime*3.28)),0,math.abs(math.cos(currentTime*3.28)),1);
 	elseif lacerate_stack<1 then
-	FeralbyNightCPFrame:SetTextColor(1,1,1,1)
+	FeralbyNightCPFrame:SetTextColor('body', 1,1,1,1)
 	elseif lacerate_stack<3 then
-		FeralbyNightCPFrame:SetTextColor(0,1,0,1)
+		FeralbyNightCPFrame:SetTextColor('body', 0,1,0,1)
 	elseif lacerate_stack<5 then
-		FeralbyNightCPFrame:SetTextColor(1,1,0,1)
+		FeralbyNightCPFrame:SetTextColor('body', 1,1,0,1)
 	else
-		FeralbyNightCPFrame:SetTextColor(1,0,0,1)
+		FeralbyNightCPFrame:SetTextColor('body', 1,0,0,1)
 	end
 		FeralbyNightCPFrame:SetText(string.format("%.0f", lacerate_stack))
 
@@ -3029,7 +3070,7 @@ end
      
      local	expheart=99999999
      local expheartpc=200
-     local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitAura("target", FeralbyNight.bossaura["XT - Exposed Heart"]); 
+     local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitAura("target", FeralbyNight.bossaura["XT - Exposed Heart"]); 
 	if name ~= nil then
 	expheart = (expirationTime - currentTime)
 	expheartpc = expheart/30
@@ -3096,8 +3137,8 @@ end
   	 end
   	 --Height based on % to pull aggro, Shading based on % of tank aggro, color based on threat status: red = tanking, yellow = losing aggro, orange = gaining aggro, grey = lower aggro than tank
 
-    	local catform, _, _, _, _, _, _, _, _ = UnitAura("player", FeralbyNight.L["Cat Form"]); 
-	local bearform, _, _, _, _, _, _, _, _ = UnitAura("player", FeralbyNight.L["Dire Bear Form"]); 
+    	local catform, _, _, _, _, _, _, _, _ = Fbn_UnitAura("player", FeralbyNight.L["Cat Form"]); 
+	local bearform, _, _, _, _, _, _, _, _ = Fbn_UnitAura("player", FeralbyNight.L["Dire Bear Form"]); 
 	
   	 local threatbar_height=(bar_height)*(threatpct/100)
   	 FeralbyNight.hudFrame_threatbar_frame:SetHeight(threatbar_height); 
@@ -3237,8 +3278,8 @@ FeralbyNight.abilitycdmon3[5]:SetTexture(GetSpellTexture(FeralbyNight.getability
 			FeralbyNight:ProcauraMonitor()
 			end
 
-	local catform, _, _, _, _, _, _, _, _ = UnitAura("player", FeralbyNight.L["Cat Form"]); 
-	local bearform, _, _, _, _, _, _, _, _ = UnitAura("player", FeralbyNight.L["Dire Bear Form"]); 
+	local catform, _, _, _, _, _, _, _, _ = Fbn_UnitAura("player", FeralbyNight.L["Cat Form"]); 
+	local bearform, _, _, _, _, _, _, _, _ = Fbn_UnitAura("player", FeralbyNight.L["Dire Bear Form"]); 
 	if (UnitName("target") == nil or UnitIsFriend("player","target") ~= nil or UnitHealth("target") == 0 or ((catform == nil) and (bearform == nil))) and FeralbyNightdb.locked==true then
 		FeralbyNight.displayFrame_last:Hide()
 		FeralbyNight.displayFrame_current:Hide()
@@ -3369,10 +3410,10 @@ local jj=3
 	FeralbyNight.proc[jj]:SetAlpha(0.8)
 	FeralbyNight.proc[jj]:SetTexture(nil)
 	procFramedumb:SetBackdropColor(0, 0, 0,0)
-	procFramedumb:SetText(nil)
+	procFramedumb:SetText("")
 
 for i=9,13 do
-		local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.procindex[i]); 
+		local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.procindex[i]); 
 			if name ~= nil then
 	  		  local procFramedumb = _G["FeralbyNightprocFrame_"..jj]
 				FeralbyNight.getproc.stack[jj]=count;
@@ -3402,7 +3443,7 @@ if ((FeralbyNight.trinket1=="nil" and FeralbyNight.trinket2=="nil") or FeralbyNi
 local jj=1
 for i=14,70 do
 		if FeralbyNight.trinket1~="nil"	then break end
-		local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.procindex[i]); 
+		local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.procindex[i]); 
 			if (name ~= nil) then
 							FeralbyNight.trinket1=(FeralbyNight.procindex[i])
 							FeralbyNight.trinket1cd=(FeralbyNight.proccdindex[i])
@@ -3421,7 +3462,7 @@ local jj=2
 
 for i=14,70 do
 		if FeralbyNight.trinket2~="nil"	then break end
-		local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.procindex[i]); 
+		local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.procindex[i]); 
 			if (name ~= nil and FeralbyNight.procindex[i] ~= FeralbyNight.trinket1) then
 							FeralbyNight.trinket2=(FeralbyNight.procindex[i])
 							FeralbyNight.trinket2cd=(FeralbyNight.proccdindex[i])
@@ -3441,7 +3482,7 @@ end
 
 local jj=1
 	  	local procFramedumb = _G["FeralbyNightprocFrame_"..jj]
-		local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.trinket1); 
+		local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.trinket1); 
 			if (name ~= nil) then
 					FeralbyNight.proc[jj]:SetAlpha(0.8)
 			 -- print(jj..","..FeralbyNight.getproc.cd[jj])
@@ -3475,13 +3516,13 @@ local jj=1
 		FeralbyNight.proc[jj]:SetAlpha(0.3)
 		else
 		FeralbyNight.proc[jj]:SetAlpha(0.5)
-		procFramedumb:SetText(nil)
+		procFramedumb:SetText("")
 		end
 		end	
 
 local jj=2
 	    local procFramedumb = _G["FeralbyNightprocFrame_"..jj]
-		local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.trinket2); 
+		local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.trinket2); 
 			if (name ~= nil) then
 					FeralbyNight.proc[jj]:SetAlpha(0.8)
 			 -- print(jj..","..FeralbyNight.getproc.cd[jj])
@@ -3515,7 +3556,7 @@ local jj=2
 		FeralbyNight.proc[jj]:SetAlpha(0.3)
 		else
 		FeralbyNight.proc[jj]:SetAlpha(0.5)
-		procFramedumb:SetText(nil)
+		procFramedumb:SetText("")
 		end
 			end	
 	
@@ -3525,11 +3566,11 @@ local jj=4
 	FeralbyNight.proc[jj]:SetAlpha(0.8)
 	FeralbyNight.proc[jj]:SetTexture(nil)
 	procFramedumb:SetBackdropColor(0, 0, 0,0)
-	procFramedumb:SetText(nil)
+	procFramedumb:SetText("")
 	end
 for i=1,8 do
 		if jj>5 then break end
-		local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.procindex[i]); 
+		local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.procindex[i]); 
 			if name ~= nil then
 	  		  local procFramedumb = _G["FeralbyNightprocFrame_"..jj]
 				FeralbyNight.getproc.stack[jj]=count;
@@ -3556,7 +3597,7 @@ for i=1,8 do
 	end
 for i=1,8 do
 		if jj>5 then break end
-		local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target",FeralbyNight.procindex[i]); 
+		local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target",FeralbyNight.procindex[i]); 
 			if name ~= nil then
 	  		  local procFramedumb = _G["FeralbyNightprocFrame_"..jj]
 				FeralbyNight.getproc.stack[jj]=count;
@@ -3590,8 +3631,8 @@ end
 function FeralbyNight:BossauraMonitor()
 
 	local currentTime = GetTime()
-	local catform, _, _, _, _, _, _, _, _ = UnitAura("player", FeralbyNight.L["Cat Form"]); 
-	local bearform, _, _, _, _, _, _, _, _ = UnitAura("player", FeralbyNight.L["Dire Bear Form"]); 
+	local catform, _, _, _, _, _, _, _, _ = Fbn_UnitAura("player", FeralbyNight.L["Cat Form"]); 
+	local bearform, _, _, _, _, _, _, _, _ = Fbn_UnitAura("player", FeralbyNight.L["Dire Bear Form"]); 
 	
 	
 		local jj=1
@@ -3602,17 +3643,17 @@ function FeralbyNight:BossauraMonitor()
 	FeralbyNight.bossfight[jj]:SetAlpha(0.5)
 	FeralbyNight.bossfight[jj]:SetTexture(nil)
 	bossfightFramedumb:SetBackdropColor(0, 0, 0,0)
-	bossfightFramedumb:SetText(nil)
+	bossfightFramedumb:SetText("")
 	end
 		
 	
 	jj=1;
 	
-	local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaurabossindex[1]); 
+	local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaurabossindex[1]); 
 
 	for i=1,57 do
 		if jj>5 then break end
-	local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaurabossindex[i]); 
+	local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaurabossindex[i]); 
 			if name ~= nil then
 	  		  local bossfightFramedumb = _G["FeralbyNightbossfightFrame_"..jj]
 				FeralbyNight.getbossaura.stack[jj]=count;
@@ -3638,7 +3679,7 @@ function FeralbyNight:BossauraMonitor()
 
 	for i=1,57 do
 		if jj>5 then break end
-		 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target",FeralbyNight.bossaurabossindex[i]); 
+		 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target",FeralbyNight.bossaurabossindex[i]); 
 			if name ~= nil then
 	  		  local bossfightFramedumb = _G["FeralbyNightbossfightFrame_"..jj]
 				FeralbyNight.getbossaura.stack[jj]=count;
@@ -3669,12 +3710,12 @@ if 	FeralbyNightdb.myfightshow == true then
 	FeralbyNight.myfight[jj]:SetAlpha(0.5)
 	FeralbyNight.myfight[jj]:SetTexture(nil)
 	myfightFramedumb:SetBackdropColor(0, 0, 0,0)
-	myfightFramedumb:SetText(nil)
+	myfightFramedumb:SetText("")
 	end
 	jj=1;
 	for i=1,57 do
 		if jj>5 then break end
-		 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.bossauramyindex[i]); 
+		 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.bossauramyindex[i]); 
 			if name ~= nil then
 	  		  local myfightFramedumb = _G["FeralbyNightmyfightFrame_"..jj]
 				FeralbyNight.getmyaura.stack[jj]=count;
@@ -3700,7 +3741,7 @@ if 	FeralbyNightdb.myfightshow == true then
 
 	for i=1,57 do
 		if jj>5 then break end
-		 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossauramyindex[i]); 
+		 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossauramyindex[i]); 
 			if name ~= nil then
 	  		  local myfightFramedumb = _G["FeralbyNightmyfightFrame_"..jj]
 				FeralbyNight.getmyaura.stack[jj]=count;
@@ -3726,7 +3767,7 @@ if 	FeralbyNightdb.myfightshow == true then
 end
 
 --Emalon start
-local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Tempest Minion - Overcharged"]) 
+local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Tempest Minion - Overcharged"]) 
 if name ~= nil then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go all out"])
 		FeralbyNight.noticestatus="go all out";
@@ -3735,7 +3776,7 @@ end
 --Emalon end
 	
 --Razor start
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Razor - Fuse Armor"])
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Razor - Fuse Armor"])
 if name ~= nil then
 if  count>3 then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["taunt"])
@@ -3744,7 +3785,7 @@ if  count>3 then
 end
 end
 
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Razor - Devouring Flame"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Razor - Devouring Flame"]) 
 if name ~= nil then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go away"])
 		FeralbyNight.noticestatus="go away";
@@ -3754,7 +3795,7 @@ end
 
 --Ignis start
 
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Ignis - Strength of the Creator"])
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Ignis - Strength of the Creator"])
 if name ~= nil and bearform ~= nil then
 if  count>=4 then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["attention"])
@@ -3768,21 +3809,21 @@ if  count>=6 and bearform ~= nil then
 end
 end
 
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Ignis - Slag Pot"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Ignis - Slag Pot"]) 
 if name ~= nil then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
 		FeralbyNight.notice_timer=GetTime()-3.7;
 end
 
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Ignis - Scorch"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Ignis - Scorch"]) 
 if name ~= nil then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go away"])
 		FeralbyNight.noticestatus="go away";
 		FeralbyNight.notice_timer=GetTime()-3.7;
 end
 
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target",FeralbyNight.bossaura["Ignis - Constructor - Molten"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target",FeralbyNight.bossaura["Ignis - Constructor - Molten"]) 
 if name ~= nil then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["kitte"])
 		FeralbyNight.noticestatus="kitte";
@@ -3792,31 +3833,31 @@ end
 --Ignis end
 
 --XT start
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["XT - Tympanic Tantrum"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["XT - Tympanic Tantrum"]) 
 if name ~= nil then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["attention"])
 		FeralbyNight.noticestatus="attention";
 		FeralbyNight.notice_timer=GetTime()-3.7;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.bossaura["XT - Searing Light"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.bossaura["XT - Searing Light"]) 
 if name ~= nil then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go away"])
 		FeralbyNight.noticestatus="go away";
 		FeralbyNight.notice_timer=GetTime()-3.7;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["XT - Searing Light"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["XT - Searing Light"]) 
 if name ~= nil then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go away"])
 		FeralbyNight.noticestatus="go away";
 		FeralbyNight.notice_timer=GetTime()-3.7;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.bossaura["XT - Gravity Bomb"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.bossaura["XT - Gravity Bomb"]) 
 if name ~= nil then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go away"])
 		FeralbyNight.noticestatus="go away";
 		FeralbyNight.notice_timer=GetTime()-3.7;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["XT - Gravity Bomb"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["XT - Gravity Bomb"]) 
 if name ~= nil then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go away"])
 		FeralbyNight.noticestatus="go away";
@@ -3824,26 +3865,26 @@ if name ~= nil then
 end
 --XT end
 --Iron council start
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["SteelBreaker - Council - Fusion Punch"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["SteelBreaker - Council - Fusion Punch"]) 
 if name ~= nil then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
 		FeralbyNight.notice_timer=GetTime()-3.7;
 end
 
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["SteelBreaker - Council - Static Disruption"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["SteelBreaker - Council - Static Disruption"]) 
 if (name ~= nil and bearform== nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go away"])
 		FeralbyNight.noticestatus="go away";
 		FeralbyNight.notice_timer=GetTime()-3.7;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["SteelBreaker - Council - Static Disruption"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["SteelBreaker - Council - Static Disruption"]) 
 if (name ~= nil and bearform== nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go away"])
 		FeralbyNight.noticestatus="go away";
 		FeralbyNight.notice_timer=GetTime()-3.7;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["SteelBreaker - Council - Overwhelming Power"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["SteelBreaker - Council - Overwhelming Power"]) 
 if (name ~= nil) then
 local 	timer2 = expirationTime - currentTime
 if timer2>8 then
@@ -3856,7 +3897,7 @@ else
 		FeralbyNight.notice_timer=GetTime()-3.7;
 end
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.bossaura["SteelBreaker - Council - Overwhelming Power"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.bossaura["SteelBreaker - Council - Overwhelming Power"]) 
 if (name ~= nil) then
 local 	timer2 = expirationTime - currentTime
 if timer2>8 then
@@ -3869,37 +3910,37 @@ else
 		FeralbyNight.notice_timer=GetTime()-3.7;
 end
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Runemaster - Council - Runic Barrier"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Runemaster - Council - Runic Barrier"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["attention"])
 		FeralbyNight.noticestatus="attention";
 		FeralbyNight.notice_timer=GetTime()-3.7;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.bossaura["Runemaster - Council - Rune of Power"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.bossaura["Runemaster - Council - Rune of Power"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go all out"])
 		FeralbyNight.noticestatus="go all out";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Runemaster - Council - Rune of Power"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Runemaster - Council - Rune of Power"]) 
 if (name ~= nil and bearform~=nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["kitte"])
 		FeralbyNight.noticestatus="kitte";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Runemaster - Council - Rune of Death"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Runemaster - Council - Rune of Death"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go away"])
 		FeralbyNight.noticestatus="go away";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Stormcaller - Council - Lightning Tendrils"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Stormcaller - Council - Lightning Tendrils"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go away"])
 		FeralbyNight.noticestatus="go away";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Stormcaller - Council - Lightning Whirl"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Stormcaller - Council - Lightning Whirl"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["attention"])
 		FeralbyNight.noticestatus="attention";
@@ -3910,7 +3951,7 @@ end
 --Iron council end	
 
 --Kologarn start
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Kologarn - Rumbler - Stone Nova"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Kologarn - Rumbler - Stone Nova"]) 
 if (name ~= nil and count>=5) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["attention"])
 		FeralbyNight.noticestatus="attention";
@@ -3921,13 +3962,13 @@ if (name ~= nil and count>=8) then
 		FeralbyNight.noticestatus="use surv cd";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Kologarn - Crunch Armor"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Kologarn - Crunch Armor"]) 
 if (name ~= nil and count>=2) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["taunt"])
 		FeralbyNight.noticestatus="taunt";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Kologarn - Focused Eyebeam"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Kologarn - Focused Eyebeam"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go away"])
 		FeralbyNight.noticestatus="go away";
@@ -3936,13 +3977,13 @@ end
 --Kologarn end
 
 --Auriaya start
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Auriaya - Seeping Feral Essence"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Auriaya - Seeping Feral Essence"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go away"])
 		FeralbyNight.noticestatus="go away";
 		FeralbyNight.notice_timer=GetTime()-3.7;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Auriaya - Strength of the Pack"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Auriaya - Strength of the Pack"]) 
 if (name ~= nil and count>=2) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["attention"])
 		FeralbyNight.noticestatus="attention";
@@ -3951,25 +3992,25 @@ end
 --Auriaya end
 
 --Freya start
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.bossaura["Freya - Fungi"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.bossaura["Freya - Fungi"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go all out"])
 		FeralbyNight.noticestatus="go all out";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Freya - Conservator's Grip"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Freya - Conservator's Grip"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["kitte"])
 		FeralbyNight.noticestatus="kitte";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Freya - Nature's Fury"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Freya - Nature's Fury"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go away"])
 		FeralbyNight.noticestatus="go away";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Snaplasher - Hardened Bark"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Snaplasher - Hardened Bark"]) 
 if (name ~= nil and count>30) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
@@ -3980,31 +4021,31 @@ if (name ~= nil and count>50) then
 		FeralbyNight.noticestatus="kitte";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Brightleaf - Brightleaf Flux"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Brightleaf - Brightleaf Flux"]) 
 if (name ~= nil and count>5 and bearform~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Ironbranch - Impale"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Ironbranch - Impale"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Stonebark - Fist of Stone"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Stonebark - Fist of Stone"]) 
 if (name ~= nil and bearform~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Stonebark - Broken Bones"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Stonebark - Broken Bones"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["taunt"])
 		FeralbyNight.noticestatus="taunt";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Stonebark - Petrified Bark"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Stonebark - Petrified Bark"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["attention"])
 		FeralbyNight.noticestatus="attention";
@@ -4013,25 +4054,25 @@ end
 --Freya end
 
 --Mimiron start
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Mimiron - Napalm Shell"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Mimiron - Napalm Shell"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Mimiron - Plasma Blast"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Mimiron - Plasma Blast"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Mimiron - Plasma Blast"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Mimiron - Plasma Blast"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target",FeralbyNight.bossaura["Mimiron - Magnetic Field"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target",FeralbyNight.bossaura["Mimiron - Magnetic Field"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go all out"])
 		FeralbyNight.noticestatus="go all out";
@@ -4040,25 +4081,25 @@ end
 --Mimiron end
 
 --Hodir start
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Hodir - Freeze"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Hodir - Freeze"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["attention"])
 		FeralbyNight.noticestatus="attention";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Hodir - Biting Cold"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Hodir - Biting Cold"]) 
 if (name ~= nil and count>=2) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["kitte"])
 		FeralbyNight.noticestatus="kitte";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.bossaura["Hodir - Stormpower"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.bossaura["Hodir - Stormpower"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go all out"])
 		FeralbyNight.noticestatus="go all out";
 		FeralbyNight.notice_timer=GetTime()-3;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Hodir - Frozen Blow"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Hodir - Frozen Blow"]) 
 if (name ~= nil and bearform ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
@@ -4067,37 +4108,37 @@ end
 --Hodir end
 
 --Thorim start
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Thorim - Lightning Charge"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Thorim - Lightning Charge"]) 
 if (name ~= nil and bearform ~= nil and count>=8) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
 		FeralbyNight.notice_timer=GetTime();
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Thorim - Unbalancing Strike"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Thorim - Unbalancing Strike"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["taunt"])
 		FeralbyNight.noticestatus="taunt";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Thorim - Frostbolt Volley"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Thorim - Frostbolt Volley"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go away"])
 		FeralbyNight.noticestatus="go away";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Thorim - Blizzard"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Thorim - Blizzard"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["go away"])
 		FeralbyNight.noticestatus="go away";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Thorim - Frostnova"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Thorim - Frostnova"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["attention"])
 		FeralbyNight.noticestatus="attention";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Thorim - Runic Colossus - Runic Barrier"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Thorim - Runic Colossus - Runic Barrier"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["attention"])
 		FeralbyNight.noticestatus="attention";
@@ -4106,55 +4147,55 @@ end
 --Thorim end
 
 --Yog-Saron start
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.bossaura["Yogg - Sara's Blessing"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.bossaura["Yogg - Sara's Blessing"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["attention"])
 		FeralbyNight.noticestatus="attention";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.bossaura["Yogg - Sara's Blessing"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.bossaura["Yogg - Sara's Blessing"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["attention"])
 		FeralbyNight.noticestatus="attention";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.bossaura["Yogg - Sara's Fervor"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.bossaura["Yogg - Sara's Fervor"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Yogg - Sara's Fervor"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Yogg - Sara's Fervor"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Yogg - Sara's Anger"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Yogg - Sara's Anger"]) 
 if (name ~= nil and bearform ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target",FeralbyNight.bossaura["Yogg - Sara's Anger"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target",FeralbyNight.bossaura["Yogg - Sara's Anger"]) 
 if (name ~= nil and bearform ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Yogg - Dark volley"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Yogg - Dark volley"]) 
 if (name ~= nil and bearform ~= nil and count>2) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("player",FeralbyNight.bossaura["Yogg - Sanity"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("player",FeralbyNight.bossaura["Yogg - Sanity"]) 
 if (name ~= nil and count<30) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["attention"])
 		FeralbyNight.noticestatus="attention";
 		FeralbyNight.notice_timer=GetTime()-3.8;
 end
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target",FeralbyNight.bossaura["Yogg - Brain Link"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target",FeralbyNight.bossaura["Yogg - Brain Link"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["attention"])
 		FeralbyNight.noticestatus="attention";
@@ -4163,7 +4204,7 @@ end
 --Yog-Saron end
 
 --Vezax start
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("target",FeralbyNight.bossaura["Vezax - Surge of Darkness"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("target",FeralbyNight.bossaura["Vezax - Surge of Darkness"]) 
 if (name ~= nil) then
  		FeralbyNight.noticetexture:SetTexture(FeralbyNight.notice["use surv cd"])
 		FeralbyNight.noticestatus="use surv cd";
@@ -4208,7 +4249,7 @@ function FeralbyNight:CooldownMonitor()
 	local bark_up=0
 
 	
-	local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Rip Debuff"]); 
+	local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Rip Debuff"]); 
 	if name ~= nil and caster == "player" then
 		rip = expirationTime - currentTime
 		if ((rip-FeralbyNight.old_rip)>=0 and (rip-FeralbyNight.old_rip)<=3 and (FeralbyNight.old_rip>0) and (rip>0) and FeralbyNight.shreded_rip<3) then
@@ -4227,82 +4268,82 @@ function FeralbyNight:CooldownMonitor()
 			if FeralbyNight.shredglyph == 0 then FeralbyNight.shreded_rip=4 end
 
 	
-		local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitAura("player", FeralbyNight.L["Barkskin"]); 
+		local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitAura("player", FeralbyNight.L["Barkskin"]); 
 	if name ~= nil then
 		bark_up = expirationTime - currentTime
 	end	
 	
 	
-		name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitAura("player", FeralbyNight.L["Survival Instincts"]); 
+		name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitAura("player", FeralbyNight.L["Survival Instincts"]); 
 	if name ~= nil then
 		surv_up = expirationTime - currentTime
 	end		
 	
-			 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Lacerate Debuff"]); 
+			 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Lacerate Debuff"]); 
 	if name ~= nil and caster == "player" then
 		lacerate = expirationTime - currentTime
 		lacerate_stack=count
 	end	
 	
-		 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Rake Debuff"]); 
+		 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Rake Debuff"]); 
 	if name ~= nil and caster == "player" then
 		rake = expirationTime - currentTime
 	end	
 	
-		 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Demoralizing Roar Debuff"]); 
+		 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Demoralizing Roar Debuff"]); 
 	if name ~= nil then
 		demoshout = expirationTime - currentTime
 	end	
 
-	 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Demoralizing Shout"]); 
+	 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Demoralizing Shout"]); 
 	if name ~= nil then
 		demoshout = expirationTime - currentTime
 	end	
 	
-	 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Curse of Weakness"]); 
+	 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Curse of Weakness"]); 
 	if name ~= nil then
 		demoshout = expirationTime - currentTime
 	end	
 
-	 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Vindication"]); 
+	 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Vindication"]); 
 	if name ~= nil then
 		demoshout = expirationTime - currentTime
 	end	
 	
 	
-		name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Mangle (Cat) Debuff"]); 
+		name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Mangle (Cat) Debuff"]); 
 	if name ~= nil then
 		mangle = expirationTime - currentTime
 	end
 	
-	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Mangle (Bear) Debuff"]); 
+	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Mangle (Bear) Debuff"]); 
 	if name ~= nil then
 		mangle = expirationTime - currentTime
 	end
 	
-	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Trauma"]); 
+	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Trauma"]); 
 	if name ~= nil then
 		trauma = expirationTime - currentTime
 	end
 
 	
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Faerie Fire (Feral)"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Faerie Fire (Feral)"]); 
 		if name ~= nil then
 			fffdur = expirationTime - currentTime
 		end
 		
-						name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Sting"]); 
+						name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Sting"]); 
 		if name ~= nil then
 			fffdur = expirationTime - currentTime
 		end
 		
-				name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Curse of Weakness"]); 
+				name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Curse of Weakness"]); 
 		if name ~= nil then
 			fffdur = expirationTime - currentTime
 		end
 
 
-		name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Faerie Fire"]); 
+		name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Faerie Fire"]); 
 		if name ~= nil then
 			fffdur = expirationTime - currentTime
 		end
@@ -4314,13 +4355,13 @@ function FeralbyNight:CooldownMonitor()
 		end
 	
 
-	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitAura("player", FeralbyNight.L["Savage Roar"]); 
+	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitAura("player", FeralbyNight.L["Savage Roar"]); 
 	if name ~= nil then
 		sr = expirationTime - currentTime
 	end	
 	
 	
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Rend"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Rend"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -4328,7 +4369,7 @@ function FeralbyNight:CooldownMonitor()
 			end
 		end
 
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Garrote"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Garrote"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -4336,7 +4377,7 @@ function FeralbyNight:CooldownMonitor()
 			end
 		end
 
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Rupture"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Rupture"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -4344,7 +4385,7 @@ function FeralbyNight:CooldownMonitor()
 			end
 		end
 
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Pounce Bleed"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Pounce Bleed"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -4352,7 +4393,7 @@ function FeralbyNight:CooldownMonitor()
 			end
 		end
 
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Savage Rend"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Savage Rend"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -4360,7 +4401,7 @@ function FeralbyNight:CooldownMonitor()
 			end
 		end
 
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Rake (Pet)"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Rake (Pet)"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -4368,7 +4409,7 @@ function FeralbyNight:CooldownMonitor()
 			end
 		end
 		
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Deep Wounds"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Deep Wounds"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -4376,7 +4417,7 @@ function FeralbyNight:CooldownMonitor()
 			end
 		end
 		
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Rake Debuff"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Rake Debuff"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -4384,7 +4425,7 @@ function FeralbyNight:CooldownMonitor()
 			end
 		end
 
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Rip Debuff"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Rip Debuff"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -4392,7 +4433,7 @@ function FeralbyNight:CooldownMonitor()
 			end
 		end
 
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Lacerate Debuff"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Lacerate Debuff"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -4461,7 +4502,7 @@ FeralbyNight.abilitycdmon[1]=FeralbyNight.abilitycdmon3[5]
 	else
 	FeralbyNight.abilitycdmon[1]:SetAlpha(0.5)
 	FeralbyNightcdmonFrame_1:SetBackdropColor(0, 0, 0,0)
-	FeralbyNightcdmonFrame_1:SetText(nil)
+	FeralbyNightcdmonFrame_1:SetText("")
 	end	
 	end
 	
@@ -4482,7 +4523,7 @@ FeralbyNight.abilitycdmon[1]=FeralbyNight.abilitycdmon3[5]
 	else
 	FeralbyNight.abilitycdmon[3]:SetAlpha(0.5)
 	FeralbyNightcdmonFrame_3:SetBackdropColor(0, 0, 0,0)
-	FeralbyNightcdmonFrame_3:SetText(nil)
+	FeralbyNightcdmonFrame_3:SetText("")
 	end	
 	end
 
@@ -4503,7 +4544,7 @@ FeralbyNight.abilitycdmon[1]=FeralbyNight.abilitycdmon3[5]
 	else
 	FeralbyNight.abilitycdmon[2]:SetAlpha(0.5)
 	FeralbyNightcdmonFrame_2:SetBackdropColor(0, 0, 0,0)
-	FeralbyNightcdmonFrame_2:SetText(nil)
+	FeralbyNightcdmonFrame_2:SetText("")
 	end	
 end
 
@@ -4517,7 +4558,7 @@ end
 	end
 	else
 	FeralbyNight.abilitycdmon[5]:SetAlpha(0.1)
-	FeralbyNightcdmonFrame_5:SetText(nil)
+	FeralbyNightcdmonFrame_5:SetText("")
 	end
 	
 	
@@ -4529,7 +4570,7 @@ end
 	end
 	else
 	FeralbyNight.abilitycdmon[11]:SetAlpha(0.1)
-	FeralbyNightcdmonFrame_11:SetText(nil)
+	FeralbyNightcdmonFrame_11:SetText("")
 	end
 	
 	
@@ -4541,7 +4582,7 @@ end
 	end
 	else
 	FeralbyNight.abilitycdmon[4]:SetAlpha(0.1)
-	FeralbyNightcdmonFrame_4:SetText(nil)
+	FeralbyNightcdmonFrame_4:SetText("")
 	end
 
 	
@@ -4557,7 +4598,7 @@ if FeralbyNight.shredglyph == 1 then
 	end
 	else
 	FeralbyNight.abilitycdmon[12]:SetAlpha(0.1)
-	FeralbyNightcdmonFrame_12:SetText(nil)
+	FeralbyNightcdmonFrame_12:SetText("")
 	end
 	
 	
@@ -4578,8 +4619,8 @@ if FeralbyNight.shredglyph == 1 then
 	else
 	FeralbyNight.abilitycdmon[10]:SetAlpha(0.1)
 	FeralbyNight.abilitycdmon2[1]:SetAlpha(0.1)
-	FeralbyNightcdmonFrame_10:SetText(nil)
-	FeralbyNightcdmonFrame2_1:SetText(nil)
+	FeralbyNightcdmonFrame_10:SetText("")
+	FeralbyNightcdmonFrame2_1:SetText("")
 	end
 	
 
@@ -4609,7 +4650,7 @@ FeralbyNight.abilitycdmon[9]:SetAlpha(0.8)
 	else
 	FeralbyNightcdmonFrame_9:SetBackdropColor(0, 0, 0,0)
 	FeralbyNight.abilitycdmon[9]:SetAlpha(0.5)
-	FeralbyNightcdmonFrame_9:SetText(nil)
+	FeralbyNightcdmonFrame_9:SetText("")
 	end	
 
 
@@ -4621,10 +4662,10 @@ FeralbyNight.abilitycdmon[9]:SetAlpha(0.8)
 	end
 	else
 	FeralbyNight.abilitycdmon[7]:SetAlpha(0.1)
-	FeralbyNightcdmonFrame_7:SetText(nil)
+	FeralbyNightcdmonFrame_7:SetText("")
 	end
 	
-	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitAura("player", FeralbyNight.L["Clearcasting"]); 
+	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitAura("player", FeralbyNight.L["Clearcasting"]); 
 	if name ~= nil then
 		ooc = expirationTime - currentTime
 		if FeralbyNightdb.oocoverride==true and ooc>0 then
@@ -4641,7 +4682,7 @@ FeralbyNight.abilitycdmon[9]:SetAlpha(0.8)
 	end
 	else
 	FeralbyNight.abilitycdmon[7]:SetAlpha(0.1)
-	FeralbyNightcdmonFrame_7:SetText(nil)
+	FeralbyNightcdmonFrame_7:SetText("")
 	end
 	end
 	
@@ -4654,7 +4695,7 @@ FeralbyNight.abilitycdmon[9]:SetAlpha(0.8)
 	end
 	else
 	FeralbyNight.abilitycdmon[13]:SetAlpha(0.1)
-	FeralbyNightcdmonFrame_13:SetText(nil)
+	FeralbyNightcdmonFrame_13:SetText("")
 	end	
 	
 
@@ -4671,7 +4712,7 @@ FeralbyNight.abilitycdmon[9]:SetAlpha(0.8)
 	else
 	FeralbyNight.abilitycdmon[6]:SetAlpha(0.5)
 	FeralbyNightcdmonFrame_6:SetBackdropColor(0, 0, 0,0)
-	FeralbyNightcdmonFrame_6:SetText(nil)
+	FeralbyNightcdmonFrame_6:SetText("")
 	end	
 	end
 	
@@ -4693,7 +4734,7 @@ FeralbyNight.abilitycdmon[9]:SetAlpha(0.8)
 	else
 	FeralbyNight.abilitycdmon[14]:SetAlpha(0.5)
 	FeralbyNightcdmonFrame_14:SetBackdropColor(0, 0, 0,0)
-	FeralbyNightcdmonFrame_14:SetText(nil)
+	FeralbyNightcdmonFrame_14:SetText("")
 	end	
 	end
 	
@@ -4719,7 +4760,7 @@ FeralbyNight.abilitycdmon[9]:SetAlpha(0.8)
 	else
 	FeralbyNight.abilitycdmon[8]:SetAlpha(0.5)
 	FeralbyNightcdmonFrame_8:SetBackdropColor(0, 0, 0,0)
-	FeralbyNightcdmonFrame_8:SetText(nil)
+	FeralbyNightcdmonFrame_8:SetText("")
 	end	
 	
 
@@ -4757,8 +4798,8 @@ function FeralbyNight:DecideSpells()
 	local currentTime = GetTime()
 	local _, status, _, _, _ = UnitDetailedThreatSituation("player","target")
 	
-	local catform, _, _, _, _, _, _, _, _ = UnitAura("player", FeralbyNight.L["Cat Form"]); 
-	local bearform, _, _, _, _, _, _, _, _ = UnitAura("player", FeralbyNight.L["Dire Bear Form"]); 
+	local catform, _, _, _, _, _, _, _, _ = Fbn_UnitAura("player", FeralbyNight.L["Cat Form"]); 
+	local bearform, _, _, _, _, _, _, _, _ = Fbn_UnitAura("player", FeralbyNight.L["Dire Bear Form"]); 
 	
 			local base, posBuff, negBuff = UnitAttackPower("player");
 	local moblevel = 0;
@@ -4888,7 +4929,7 @@ function FeralbyNight:DecideSpells()
 	manglebot=0
 	end
 
-	local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitAura("player", FeralbyNight.L["Clearcasting"]); 
+	local name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitAura("player", FeralbyNight.L["Clearcasting"]); 
 	if name ~= nil then
 		ooc = expirationTime - currentTime
 	end
@@ -4941,11 +4982,11 @@ function FeralbyNight:DecideSpells()
 end
 	
 	
-				name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitAura("player", FeralbyNight.L["Heroic Presence (a)"]); 
+				name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitAura("player", FeralbyNight.L["Heroic Presence (a)"]); 
 	if name ~= nil then
 		heropres =1
 	else	
-		name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitAura("player", FeralbyNight.L["Heroic Presence (b)"]); 
+		name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitAura("player", FeralbyNight.L["Heroic Presence (b)"]); 
 		if name ~= nil then
 		heropres =1
 	end
@@ -4974,47 +5015,47 @@ end
 	armorred = armorPenetration;
 	--end
 	
-	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Rake Debuff"]); 
+	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Rake Debuff"]); 
 	if name ~= nil and caster == "player" then
 		rake = expirationTime - currentTime
 	end	
 	
-	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Rip Debuff"]); 
+	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Rip Debuff"]); 
 	if name ~= nil and caster == "player" then
 		rip = expirationTime - currentTime
 	end
 	
-	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Mangle (Cat) Debuff"]); 
+	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Mangle (Cat) Debuff"]); 
 	if name ~= nil then
 		mangle = expirationTime - currentTime
 	end
 	
-	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Mangle (Bear) Debuff"]); 
+	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Mangle (Bear) Debuff"]); 
 	if name ~= nil then
 		mangle = expirationTime - currentTime
 	end
 	
-	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Trauma"]); 
+	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Trauma"]); 
 	if name ~= nil then
 		trauma = expirationTime - currentTime
 	end
 	
-		name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Faerie Fire (Feral)"]); 
+		name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Faerie Fire (Feral)"]); 
 		if name ~= nil then
 			fffdur = expirationTime - currentTime
 		end
 		
-						name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Sting"]); 
+						name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Sting"]); 
 		if name ~= nil then
 			fffdur = expirationTime - currentTime
 		end
 		
-				name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Curse of Weakness"]); 
+				name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Curse of Weakness"]); 
 		if name ~= nil then
 			fffdur = expirationTime - currentTime
 		end
 		
-		name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Faerie Fire"]); 
+		name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Faerie Fire"]); 
 		if name ~= nil then
 			fffdur = expirationTime - currentTime
 		end
@@ -5024,30 +5065,30 @@ end
 		fff = duration + start - currentTime	
 		end
 		
-						name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Acid Spit"]); 
+						name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Acid Spit"]); 
 		if name ~= nil then
 			sunder = expirationTime - currentTime
 			sunderstack=count
 		end
 		
-						name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Expose Armor"]); 
+						name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Expose Armor"]); 
 		if name ~= nil then
 			sunder = expirationTime - currentTime
 			sunderstack=count
 		end
 		
-						name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Sunder Armor"]); 
+						name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Sunder Armor"]); 
 		if name ~= nil then
 			sunder = expirationTime - currentTime
 			sunderstack=count
 		end
 		
-								name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Heart of the Crusader"]); 
+								name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Heart of the Crusader"]); 
 		if name ~= nil then
 			crittaken = expirationTime - currentTime
 		end
 		
-								name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Master Poisoner"]); 
+								name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Master Poisoner"]); 
 		if name ~= nil then
 			crittaken = expirationTime - currentTime
 		end
@@ -5056,7 +5097,7 @@ end
 		
 
 
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Rend"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Rend"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -5064,7 +5105,7 @@ end
 			end
 		end
 
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Garrote"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Garrote"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -5072,7 +5113,7 @@ end
 			end
 		end
 
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Rupture"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Rupture"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -5080,7 +5121,7 @@ end
 			end
 		end
 
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Pounce Bleed"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Pounce Bleed"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -5088,7 +5129,7 @@ end
 			end
 		end
 
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Savage Rend"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Savage Rend"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -5096,7 +5137,7 @@ end
 			end
 		end
 
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Rake (Pet)"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Rake (Pet)"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -5104,7 +5145,7 @@ end
 			end
 		end
 		
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Deep Wounds"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Deep Wounds"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -5112,7 +5153,7 @@ end
 			end
 		end
 		
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Rake Debuff"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Rake Debuff"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -5120,7 +5161,7 @@ end
 			end
 		end
 
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Rip Debuff"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Rip Debuff"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -5128,7 +5169,7 @@ end
 			end
 		end
 
-			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Lacerate Debuff"]); 
+			name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Lacerate Debuff"]); 
 		if name ~= nil then
 			bleeds_dump = expirationTime - currentTime
 			if bleeds_dump>bleeds then
@@ -5148,12 +5189,12 @@ end
 		end
 		end
 	
-	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitAura("player", FeralbyNight.L["Savage Roar"]); 
+	name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitAura("player", FeralbyNight.L["Savage Roar"]); 
 	if name ~= nil then
 		sr = expirationTime - currentTime
 	end	
 	
-		name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitAura("player", FeralbyNight.L["Totem of Wrath"]); 
+		name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitAura("player", FeralbyNight.L["Totem of Wrath"]); 
 	if name ~= nil then
 		crittaken = 1
 	end	
@@ -5255,7 +5296,7 @@ end
 							use_rake=0;
 							end
 							
-name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitBuff("player",FeralbyNight.bossaura["Hodir - Stormpower"]) 
+name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitBuff("player",FeralbyNight.bossaura["Hodir - Stormpower"]) 
 if ((name ~= nil) and FeralbyNightdb.bossmode==true) then
 use_rake=0;
 end
@@ -5341,28 +5382,28 @@ end
 	surv = duration + start - currentTime
 	end
 	
-		 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Lacerate Debuff"]); 
+		 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Lacerate Debuff"]); 
 	if name ~= nil and caster == "player" then
 		lacerate = expirationTime - currentTime
 		lacerate_stack=count
 	end	
 	
-	 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Demoralizing Roar Debuff"]); 
+	 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Demoralizing Roar Debuff"]); 
 	if name ~= nil then
 		demoshout = expirationTime - currentTime
 	end	
 
-	 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Demoralizing Shout"]); 
+	 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Demoralizing Shout"]); 
 	if name ~= nil then
 		demoshout = expirationTime - currentTime
 	end	
 	
-	 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Curse of Weakness"]); 
+	 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Curse of Weakness"]); 
 	if name ~= nil then
 		demoshout = expirationTime - currentTime
 	end	
 
-	 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = UnitDebuff("target", FeralbyNight.L["Vindication"]); 
+	 name, rank, icon, count, debuffType, duration, expirationTime, caster, isStealable = Fbn_UnitDebuff("target", FeralbyNight.L["Vindication"]); 
 	if name ~= nil then
 		demoshout = expirationTime - currentTime
 	end	
@@ -6075,7 +6116,7 @@ end
 
 function FeralbyNight:SetsrFont(num)
 FeralbyNightdb.srFramefont = FeralbyNight.fontvector[num]
-FeralbyNight.srFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.srFramefont, FeralbyNightdb.srFramefontsize);
+FeralbyNight.srFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.srFramefont, FeralbyNightdb.srFramefontsize,"");
 end
 
 
@@ -6093,7 +6134,7 @@ end
 
 function FeralbyNight:SetMeleeFont(num)
 FeralbyNightdb.MeleeFramefont = FeralbyNight.fontvector[num]
-FeralbyNight.MeleeFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.MeleeFramefont, FeralbyNightdb.MeleeFramefontsize);
+FeralbyNight.MeleeFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.MeleeFramefont, FeralbyNightdb.MeleeFramefontsize,"");
 end
 
 
@@ -6111,7 +6152,7 @@ end
 
 function FeralbyNight:SetenergyFont(num)
 FeralbyNightdb.energyFramefont = FeralbyNight.fontvector[num]
-FeralbyNight.energyFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.energyFramefont, FeralbyNightdb.energyFramefontsize);
+FeralbyNight.energyFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.energyFramefont, FeralbyNightdb.energyFramefontsize,"");
 end
 
 
@@ -6130,7 +6171,7 @@ end
 
 function FeralbyNight:SettimetokillFont(num)
 FeralbyNightdb.timetokillFramefont = FeralbyNight.fontvector[num]
-FeralbyNight.timetokillFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.timetokillFramefont, FeralbyNightdb.timetokillFramefontsize);
+FeralbyNight.timetokillFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.timetokillFramefont, FeralbyNightdb.timetokillFramefontsize,"");
 end
 
 
@@ -6150,7 +6191,7 @@ end
 
 function FeralbyNight:SetcpFont(num)
 FeralbyNightdb.cpFramefont = FeralbyNight.fontvector[num]
-FeralbyNight.CPFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cpFramefont, FeralbyNightdb.cpFramefontsize);
+FeralbyNight.CPFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cpFramefont, FeralbyNightdb.cpFramefontsize,"");
 end
 
 
@@ -6170,7 +6211,7 @@ function FeralbyNight:SetbossfightFont(num)
 FeralbyNightdb.bossfightFramefont = FeralbyNight.fontvector[num]
   do jj=1,5
   local bossfightFramedumb = _G["FeralbyNightbossfightFrame_"..jj];
-  bossfightFramedumb:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.bossfightFramefont, FeralbyNightdb.bossfightFramefontsize);
+  bossfightFramedumb:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.bossfightFramefont, FeralbyNightdb.bossfightFramefontsize,"");
   end
 end
 
@@ -6190,7 +6231,7 @@ function FeralbyNight:SetmyfightFont(num)
 FeralbyNightdb.myfightFramefont = FeralbyNight.fontvector[num]
   do jj=1,5
   local myfightFramedumb = _G["FeralbyNightmyfightFrame_"..jj];
-  myfightFramedumb:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.myfightFramefont, FeralbyNightdb.myfightFramefontsize);
+  myfightFramedumb:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.myfightFramefont, FeralbyNightdb.myfightFramefontsize,"");
   end
 end
 
@@ -6210,7 +6251,7 @@ function FeralbyNight:SetprocFont(num)
 FeralbyNightdb.procFramefont = FeralbyNight.fontvector[num]
   do jj=1,5
   local procFramedumb = _G["FeralbyNightprocFrame_"..jj];
-  procFramedumb:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.procFramefont, FeralbyNightdb.procFramefontsize);
+  procFramedumb:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.procFramefont, FeralbyNightdb.procFramefontsize,"");
   end
 end
 
@@ -6241,24 +6282,24 @@ end
 
 function FeralbyNight:SetbarFont(num)
 FeralbyNightdb.barfont = FeralbyNight.fontvector[num]
-FeralbyNight.hudFrame_manabar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize);
-FeralbyNight.hudFrame_threatbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize);
-FeralbyNight.hudFrame_castbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize);
-FeralbyNight.hudFrame_bosspowerbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize);
-FeralbyNight.hudFrame_healthbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize);
-FeralbyNight.hudFrame_bosshealthbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize);
-FeralbyNight.hudFrame_powerbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize);
+FeralbyNight.hudFrame_manabar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"");
+FeralbyNight.hudFrame_threatbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"");
+FeralbyNight.hudFrame_castbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"");
+FeralbyNight.hudFrame_bosspowerbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"");
+FeralbyNight.hudFrame_healthbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"");
+FeralbyNight.hudFrame_bosshealthbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"");
+FeralbyNight.hudFrame_powerbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"");
 end
 
 function FeralbyNight:Setbartexture(num)
 FeralbyNightdb.bartexture = FeralbyNight.texturevector[num]
-FeralbyNight.hudFrame_manabar_frame:SetStatusBarTexture("Interface\\AddOns\\FeralbyNight\\arts\\statusbar\\"..FeralbyNightdb.bartexture);
-FeralbyNight.hudFrame_castbar_frame:SetStatusBarTexture("Interface\\AddOns\\FeralbyNight\\arts\\statusbar\\"..FeralbyNightdb.bartexture);
-FeralbyNight.hudFrame_threatbar_frame:SetStatusBarTexture("Interface\\AddOns\\FeralbyNight\\arts\\statusbar\\"..FeralbyNightdb.bartexture);
-FeralbyNight.hudFrame_bosspowerbar_frame:SetStatusBarTexture("Interface\\AddOns\\FeralbyNight\\arts\\statusbar\\"..FeralbyNightdb.bartexture);
-FeralbyNight.hudFrame_healthbar_frame:SetStatusBarTexture("Interface\\AddOns\\FeralbyNight\\arts\\statusbar\\"..FeralbyNightdb.bartexture);
-FeralbyNight.hudFrame_bosshealthbar_frame:SetStatusBarTexture("Interface\\AddOns\\FeralbyNight\\arts\\statusbar\\"..FeralbyNightdb.bartexture);
-FeralbyNight.hudFrame_powerbar_frame:SetStatusBarTexture("Interface\\AddOns\\FeralbyNight\\arts\\statusbar\\"..FeralbyNightdb.bartexture);
+FeralbyNight.hudFrame_manabar_frame:SetStatusBarTexture("Interface\\AddOns\\FeralbyNight\\arts\\statusbar\\"..FeralbyNightdb.bartexture,"");
+FeralbyNight.hudFrame_castbar_frame:SetStatusBarTexture("Interface\\AddOns\\FeralbyNight\\arts\\statusbar\\"..FeralbyNightdb.bartexture,"");
+FeralbyNight.hudFrame_threatbar_frame:SetStatusBarTexture("Interface\\AddOns\\FeralbyNight\\arts\\statusbar\\"..FeralbyNightdb.bartexture,"");
+FeralbyNight.hudFrame_bosspowerbar_frame:SetStatusBarTexture("Interface\\AddOns\\FeralbyNight\\arts\\statusbar\\"..FeralbyNightdb.bartexture,"");
+FeralbyNight.hudFrame_healthbar_frame:SetStatusBarTexture("Interface\\AddOns\\FeralbyNight\\arts\\statusbar\\"..FeralbyNightdb.bartexture,"");
+FeralbyNight.hudFrame_bosshealthbar_frame:SetStatusBarTexture("Interface\\AddOns\\FeralbyNight\\arts\\statusbar\\"..FeralbyNightdb.bartexture,"");
+FeralbyNight.hudFrame_powerbar_frame:SetStatusBarTexture("Interface\\AddOns\\FeralbyNight\\arts\\statusbar\\"..FeralbyNightdb.bartexture,"");
 end
 
 
@@ -6276,11 +6317,11 @@ end
 
 function FeralbyNight:SetcdmonFont1(num)
 FeralbyNightdb.cdmonFramefont1 = FeralbyNight.fontvector[num]
-FeralbyNightcdmonFrame1_1:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1);
-FeralbyNightcdmonFrame1_2:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1);
-FeralbyNightcdmonFrame1_3:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1);
-FeralbyNightcdmonFrame1_4:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1);
-FeralbyNightcdmonFrame1_5:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1);
+FeralbyNightcdmonFrame1_1:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1,"");
+FeralbyNightcdmonFrame1_2:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1,"");
+FeralbyNightcdmonFrame1_3:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1,"");
+FeralbyNightcdmonFrame1_4:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1,"");
+FeralbyNightcdmonFrame1_5:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1,"");
   end
 
 
@@ -6297,11 +6338,11 @@ end
 
 function FeralbyNight:SetcdmonFont2(num)
 FeralbyNightdb.cdmonFramefont2 = FeralbyNight.fontvector[num]
-FeralbyNightcdmonFrame2_1:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2);
-FeralbyNightcdmonFrame2_2:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2);
-FeralbyNightcdmonFrame2_3:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2);
-FeralbyNightcdmonFrame2_4:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2);
-FeralbyNightcdmonFrame2_5:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2);
+FeralbyNightcdmonFrame2_1:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2,"");
+FeralbyNightcdmonFrame2_2:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2,"");
+FeralbyNightcdmonFrame2_3:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2,"");
+FeralbyNightcdmonFrame2_4:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2,"");
+FeralbyNightcdmonFrame2_5:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2,"");
   end
 
 
@@ -6319,11 +6360,11 @@ end
 
 function FeralbyNight:SetcdmonFont3(num)
 FeralbyNightdb.cdmonFramefont3 = FeralbyNight.fontvector[num]
-FeralbyNightcdmonFrame3_1:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3);
-FeralbyNightcdmonFrame3_2:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3);
-FeralbyNightcdmonFrame3_3:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3);
-FeralbyNightcdmonFrame3_4:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3);
-FeralbyNightcdmonFrame3_5:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3);
+FeralbyNightcdmonFrame3_1:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3,"");
+FeralbyNightcdmonFrame3_2:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3,"");
+FeralbyNightcdmonFrame3_3:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3,"");
+FeralbyNightcdmonFrame3_4:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3,"");
+FeralbyNightcdmonFrame3_5:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3,"");
   end
 
 
@@ -7512,7 +7553,7 @@ function FeralbyNight:CreateOptionFrame()
   slider4012:SetMinMaxValues(6, 40)
   slider4012:SetValue(tonumber(FeralbyNightdb.srFramefontsize))
   slider4012:SetValueStep(1)
-  slider4012:SetScript("OnValueChanged", function(self) FeralbyNightdb.srFramefontsize=tostring(self:GetValue()); FeralbyNight.srFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.srFramefont, FeralbyNightdb.srFramefontsize); _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end)  
+  slider4012:SetScript("OnValueChanged", function(self) FeralbyNightdb.srFramefontsize=tostring(self:GetValue()); FeralbyNight.srFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.srFramefont, FeralbyNightdb.srFramefontsize,""); _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end)  
   _G[slider4012:GetName() .. "Low"]:SetText("6")
   _G[slider4012:GetName() .. "High"]:SetText("40")
   _G[slider4012:GetName() .. "Text"]:SetText(tonumber(FeralbyNightdb.srFramefontsize))
@@ -7541,7 +7582,7 @@ function FeralbyNight:CreateOptionFrame()
   slider4022:SetMinMaxValues(6, 40)
   slider4022:SetValue(tonumber(FeralbyNightdb.energyFramefontsize))
   slider4022:SetValueStep(1)
-  slider4022:SetScript("OnValueChanged", function(self) FeralbyNightdb.energyFramefontsize=tostring(self:GetValue()); FeralbyNight.energyFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.energyFramefont, FeralbyNightdb.energyFramefontsize); _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end)
+  slider4022:SetScript("OnValueChanged", function(self) FeralbyNightdb.energyFramefontsize=tostring(self:GetValue()); FeralbyNight.energyFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.energyFramefont, FeralbyNightdb.energyFramefontsize,""); _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end)
   _G[slider4022:GetName() .. "Low"]:SetText("6")
   _G[slider4022:GetName() .. "High"]:SetText("40")
   _G[slider4022:GetName() .. "Text"]:SetText(tonumber(FeralbyNightdb.energyFramefontsize))
@@ -7570,7 +7611,7 @@ function FeralbyNight:CreateOptionFrame()
   slider4032:SetMinMaxValues(6, 40)
   slider4032:SetValue(tonumber(FeralbyNightdb.cpFramefontsize))
   slider4032:SetValueStep(1)
-  slider4032:SetScript("OnValueChanged", function(self) FeralbyNightdb.cpFramefontsize=tostring(self:GetValue()); FeralbyNight.CPFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cpFramefont, FeralbyNightdb.cpFramefontsize); _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end) 
+  slider4032:SetScript("OnValueChanged", function(self) FeralbyNightdb.cpFramefontsize=tostring(self:GetValue()); FeralbyNight.CPFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cpFramefont, FeralbyNightdb.cpFramefontsize,""); _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end) 
   _G[slider4032:GetName() .. "Low"]:SetText("6")
   _G[slider4032:GetName() .. "High"]:SetText("40")
   _G[slider4032:GetName() .. "Text"]:SetText(tonumber(FeralbyNightdb.cpFramefontsize))
@@ -7601,7 +7642,7 @@ function FeralbyNight:CreateOptionFrame()
   slider4042:SetMinMaxValues(6, 40)
   slider4042:SetValue(tonumber(FeralbyNightdb.timetokillFramefontsize))
   slider4042:SetValueStep(1)
-  slider4042:SetScript("OnValueChanged", function(self) FeralbyNightdb.timetokillFramefontsize=tostring(self:GetValue()); FeralbyNight.timetokillFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.timetokillFramefont, FeralbyNightdb.timetokillFramefontsize); _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end) 
+  slider4042:SetScript("OnValueChanged", function(self) FeralbyNightdb.timetokillFramefontsize=tostring(self:GetValue()); FeralbyNight.timetokillFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.timetokillFramefont, FeralbyNightdb.timetokillFramefontsize,""); _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end) 
   _G[slider4042:GetName() .. "Low"]:SetText("6")
   _G[slider4042:GetName() .. "High"]:SetText("40")
   _G[slider4042:GetName() .. "Text"]:SetText(tonumber(FeralbyNightdb.timetokillFramefontsize))
@@ -7632,7 +7673,7 @@ function FeralbyNight:CreateOptionFrame()
   slider4052:SetMinMaxValues(6, 40)
   slider4052:SetValue(tonumber(FeralbyNightdb.MeleeFramefontsize))
   slider4052:SetValueStep(1)
-  slider4052:SetScript("OnValueChanged", function(self) FeralbyNightdb.MeleeFramefontsize=tostring(self:GetValue()); FeralbyNight.MeleeFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.MeleeFramefont, FeralbyNightdb.MeleeFramefontsize); _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end)
+  slider4052:SetScript("OnValueChanged", function(self) FeralbyNightdb.MeleeFramefontsize=tostring(self:GetValue()); FeralbyNight.MeleeFrame:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.MeleeFramefont, FeralbyNightdb.MeleeFramefontsize,""); _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end)
   _G[slider4052:GetName() .. "Low"]:SetText("6")
   _G[slider4052:GetName() .. "High"]:SetText("40")
   _G[slider4052:GetName() .. "Text"]:SetText(tonumber(FeralbyNightdb.MeleeFramefontsize))
@@ -7662,11 +7703,11 @@ function FeralbyNight:CreateOptionFrame()
   slider4082:SetValue(tonumber(FeralbyNightdb.cdmonFramefontsize1))
   slider4082:SetValueStep(1)
   slider4082:SetScript("OnValueChanged", function(self) FeralbyNightdb.cdmonFramefontsize1=tostring(self:GetValue()); 
-FeralbyNightcdmonFrame1_1:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1);
-FeralbyNightcdmonFrame1_2:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1);
-FeralbyNightcdmonFrame1_3:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1);
-FeralbyNightcdmonFrame1_4:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1);
-FeralbyNightcdmonFrame1_5:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1); _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end)
+FeralbyNightcdmonFrame1_1:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1,"");
+FeralbyNightcdmonFrame1_2:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1,"");
+FeralbyNightcdmonFrame1_3:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1,"");
+FeralbyNightcdmonFrame1_4:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1,"");
+FeralbyNightcdmonFrame1_5:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont1, FeralbyNightdb.cdmonFramefontsize1,""); _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end)
   _G[slider4082:GetName() .. "Low"]:SetText("6")
   _G[slider4082:GetName() .. "High"]:SetText("40")
   _G[slider4082:GetName() .. "Text"]:SetText(tonumber(FeralbyNightdb.cdmonFramefontsize1))
@@ -7698,11 +7739,11 @@ FeralbyNightcdmonFrame1_5:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\
   slider4092:SetValue(tonumber(FeralbyNightdb.cdmonFramefontsize2))
   slider4092:SetValueStep(1)
   slider4092:SetScript("OnValueChanged", function(self) FeralbyNightdb.cdmonFramefontsize2=tostring(self:GetValue()); 
-FeralbyNightcdmonFrame2_1:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2);
-FeralbyNightcdmonFrame2_2:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2);
-FeralbyNightcdmonFrame2_3:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2);
-FeralbyNightcdmonFrame2_4:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2);
-FeralbyNightcdmonFrame2_5:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2); _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end)
+FeralbyNightcdmonFrame2_1:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2,"");
+FeralbyNightcdmonFrame2_2:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2,"");
+FeralbyNightcdmonFrame2_3:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2,"");
+FeralbyNightcdmonFrame2_4:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2,"");
+FeralbyNightcdmonFrame2_5:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont2, FeralbyNightdb.cdmonFramefontsize2,""); _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end)
   _G[slider4092:GetName() .. "Low"]:SetText("6")
   _G[slider4092:GetName() .. "High"]:SetText("40")
   _G[slider4092:GetName() .. "Text"]:SetText(tonumber(FeralbyNightdb.cdmonFramefontsize2))
@@ -7732,11 +7773,11 @@ FeralbyNightcdmonFrame2_5:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\
   slider4103:SetValue(tonumber(FeralbyNightdb.cdmonFramefontsize3))
   slider4103:SetValueStep(1)
   slider4103:SetScript("OnValueChanged", function(self) FeralbyNightdb.cdmonFramefontsize3=tostring(self:GetValue()); 
-  FeralbyNightcdmonFrame3_1:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3);
-FeralbyNightcdmonFrame3_2:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3);
-FeralbyNightcdmonFrame3_3:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3);
-FeralbyNightcdmonFrame3_4:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3);
-FeralbyNightcdmonFrame3_5:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3);
+  FeralbyNightcdmonFrame3_1:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3,"");
+FeralbyNightcdmonFrame3_2:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3,"");
+FeralbyNightcdmonFrame3_3:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3,"");
+FeralbyNightcdmonFrame3_4:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3,"");
+FeralbyNightcdmonFrame3_5:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.cdmonFramefont3, FeralbyNightdb.cdmonFramefontsize3,"");
    _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end)
   _G[slider4103:GetName() .. "Low"]:SetText("6")
   _G[slider4103:GetName() .. "High"]:SetText("40")
@@ -7768,13 +7809,13 @@ FeralbyNightcdmonFrame3_5:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\
   slider4123:SetValue(tonumber(FeralbyNightdb.barfontsize))
   slider4123:SetValueStep(1)
   slider4123:SetScript("OnValueChanged", function(self) FeralbyNightdb.barfontsize=tostring(self:GetValue()); 
-FeralbyNight.hudFrame_manabar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize);
-FeralbyNight.hudFrame_threatbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize);
-FeralbyNight.hudFrame_castbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize);
-FeralbyNight.hudFrame_bosspowerbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize);
-FeralbyNight.hudFrame_healthbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize);
-FeralbyNight.hudFrame_bosshealthbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize);
-FeralbyNight.hudFrame_powerbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize);
+FeralbyNight.hudFrame_manabar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"");
+FeralbyNight.hudFrame_threatbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"");
+FeralbyNight.hudFrame_castbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"");
+FeralbyNight.hudFrame_bosspowerbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"");
+FeralbyNight.hudFrame_healthbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"");
+FeralbyNight.hudFrame_bosshealthbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"");
+FeralbyNight.hudFrame_powerbar.text:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.barfont, FeralbyNightdb.barfontsize,"");
 _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end)
   _G[slider4123:GetName() .. "Low"]:SetText("6")
   _G[slider4123:GetName() .. "High"]:SetText("40")
@@ -8069,7 +8110,7 @@ end
   slider5062:SetScript("OnValueChanged", function(self) FeralbyNightdb.bossfightFramefontsize=tostring(self:GetValue()); 
   do jj=1,5
   local bossfightFramedumb = _G["FeralbyNightbossfightFrame_"..jj];
-  bossfightFramedumb:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.bossfightFramefont, FeralbyNightdb.bossfightFramefontsize);
+  bossfightFramedumb:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.bossfightFramefont, FeralbyNightdb.bossfightFramefontsize,"");
   end; _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end)
   _G[slider5062:GetName() .. "Low"]:SetText("6")
   _G[slider5062:GetName() .. "High"]:SetText("50")
@@ -8107,7 +8148,7 @@ end
   slider5072:SetScript("OnValueChanged", function(self) FeralbyNightdb.myfightFramefontsize=tostring(self:GetValue()); 
   do jj=1,5
   local myfightFramedumb = _G["FeralbyNightmyfightFrame_"..jj];
-  myfightFramedumb:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.myfightFramefont, FeralbyNightdb.myfightFramefontsize);
+  myfightFramedumb:SetFont("Interface\\AddOns\\FeralbyNight\\arts\\fonts\\"..FeralbyNightdb.myfightFramefont, FeralbyNightdb.myfightFramefontsize,"");
   end; _G[self:GetName() .. "Text"]:SetText(self:GetValue()) end)
   _G[slider5072:GetName() .. "Low"]:SetText("6")
   _G[slider5072:GetName() .. "High"]:SetText("50")
